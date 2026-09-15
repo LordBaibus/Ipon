@@ -85,7 +85,6 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                     controller: _urlController,
                     placeholder: 'e.g. https://ipon-app.com/api',
                     keyboardType: TextInputType.url,
-                    autocorrect: false,
                     enabled: !isConnecting,
                     prefixIcon: const Icon(CupertinoIcons.link),
                     onSubmitted: (_) => _attemptConnect(),
@@ -116,12 +115,36 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                   ],
 
                   const SizedBox(height: 24),
-
-                  GlassButton(
-                    onTap: isConnecting ? null : _attemptConnect,
-                    child: isConnecting
-                        ? const CupertinoActivityIndicator()
-                        : const Text('Connect to Server'),
+                  SizedBox(
+                    width: double.infinity,
+                    child: GlassButton.custom(
+                      onTap: isConnecting ? () {} : _attemptConnect,
+                      enabled: !isConnecting,
+                      width: double.infinity,
+                      height: 52,
+                      child: isConnecting
+                          ? const CupertinoActivityIndicator(
+                        color: CupertinoColors.white,
+                      )
+                          : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            CupertinoIcons.arrow_right_circle_fill,
+                            color: CupertinoColors.white,
+                            size: 20,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Connect to Server',
+                            style: TextStyle(
+                              color: CupertinoColors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
 
                   const SizedBox(height: 32),

@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_client.dart';
 
 enum ConnectionStatus { initial, connecting, connected, disconnected }
-
 class ServerConfig {
   final String baseUrl;
   final ConnectionStatus status;
@@ -40,13 +39,10 @@ class ServerConfigNotifier extends Notifier<ServerConfig> {
 
   @override
   ServerConfig build() {
-    // Stop the poll timer automatically when this provider is disposed
-    // (e.g. hot restart during development).
     ref.onDispose(() => _pollTimer?.cancel());
     _restoreSavedUrl();
     return const ServerConfig();
   }
-
 
   Future<void> _restoreSavedUrl() async {
     final prefs = await SharedPreferences.getInstance();
@@ -67,7 +63,6 @@ class ServerConfigNotifier extends Notifier<ServerConfig> {
     }
     return url;
   }
-
   Future<void> connect(String rawUrl) async {
     final url = _normalize(rawUrl);
 
@@ -95,7 +90,7 @@ class ServerConfigNotifier extends Notifier<ServerConfig> {
     } else {
       state = state.copyWith(
         status: ConnectionStatus.disconnected,
-        errorMessage: result.message,
+        errorMessage: result.message ?? 'Could not connect to the server.',
       );
     }
   }
@@ -112,21 +107,18 @@ class ServerConfigNotifier extends Notifier<ServerConfig> {
       _markDisconnected(result.message);
     }
   }
-
   void reportRequestFailure(String reason) {
     if (state.status == ConnectionStatus.connected) {
       _markDisconnected(reason);
     }
   }
-
-  void _markDisconnected(String reason) {
+  void _markDisconnected(String? reason) {
     _pollTimer?.cancel();
     state = state.copyWith(
       status: ConnectionStatus.disconnected,
-      errorMessage: reason,
+      errorMessage: reason ?? 'Lost connection to the server.',
     );
   }
-
   void resetToEntry() {
     _pollTimer?.cancel();
     state = state.copyWith(status: ConnectionStatus.initial, clearError: true);

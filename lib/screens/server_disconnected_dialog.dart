@@ -24,35 +24,73 @@ class ServerDisconnectionListener extends ConsumerWidget {
   }
 
   void _showDisconnectedDialog(BuildContext context, WidgetRef ref) {
-    showCupertinoDialog(
+    showCupertinoDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => GlassDialog(
-        title: const Text('Server Disconnected'),
-        content: const Padding(
-          padding: EdgeInsets.only(top: 8),
-          child: Text(
-            'The connection to the server was lost. Please check that '
-                'the server is still running and that your device is '
-                'connected to the network.',
-            textAlign: TextAlign.center,
+      builder: (dialogContext) => Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: GlassCard(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  CupertinoIcons.wifi_slash,
+                  size: 40,
+                  color: CupertinoColors.systemRed,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Server Disconnected',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: CupertinoColors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'The connection to the server was lost. Please check '
+                      'that the server is still running and that your '
+                      'device is connected to the network.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: CupertinoColors.white,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: GlassButton.custom(
+                    width: double.infinity,
+                    height: 48,
+                    onTap: () {
+                      Navigator.of(dialogContext).pop();
+                      ref.read(serverConfigProvider.notifier).resetToEntry();
+                      Navigator.of(context).pushAndRemoveUntil(
+                        CupertinoPageRoute(
+                          builder: (_) =>
+                              ServerConfigScreen(homeScreen: child),
+                        ),
+                            (route) => false,
+                      );
+                    },
+                    child: const Text(
+                      'Close',
+                      style: TextStyle(
+                        color: CupertinoColors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        actions: [
-          GlassButton(
-            child: const Text('Close'),
-            onTap: () {
-              Navigator.of(dialogContext).pop();
-              ref.read(serverConfigProvider.notifier).resetToEntry();
-              Navigator.of(context).pushAndRemoveUntil(
-                CupertinoPageRoute(
-                  builder: (_) => ServerConfigScreen(homeScreen: child),
-                ),
-                    (route) => false,
-              );
-            },
-          ),
-        ],
       ),
     );
   }
