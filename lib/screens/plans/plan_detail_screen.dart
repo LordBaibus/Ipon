@@ -5,6 +5,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../../core/models/plan.dart';
 import '../../core/providers/plans_provider.dart';
 import '../../widgets/primary_glass_button.dart';
+import '../dashboard/dashboard_screen.dart' show kAppBarClearance;
 
 class PlanDetailScreen extends ConsumerStatefulWidget {
   final int planId;
@@ -16,7 +17,6 @@ class PlanDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
-  /// Working copy while editing. Null means "not editing".
   List<PlanCategory>? _draftCategories;
   bool _isSaving = false;
 
@@ -138,6 +138,14 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
       statusBarStyle: GlassStatusBarStyle.auto,
       appBar: GlassAppBar(
         title: const Text('Plan'),
+        leading: GlassButton(
+          icon: const Icon(CupertinoIcons.back),
+          label: 'Back',
+          width: 40,
+          height: 40,
+          enabled: !_isSaving,
+          onTap: _isSaving ? () {} : () => Navigator.of(context).pop(),
+        ),
         actions: [
           if (planAsync.value != null && !_isEditing)
             GlassButton(
@@ -148,21 +156,35 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
       ),
       body: SafeArea(
         child: planAsync.when(
-          loading: () => const Center(
-            child: GlassProgressIndicator.circular(size: 28),
-          ),
-          error: (error, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Text(
-                error.toString().replaceFirst('Exception: ', ''),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: CupertinoColors.secondaryLabel,
+          loading: () => const Column(
+            children: [
+              SizedBox(height: kAppBarClearance),
+              Expanded(
+                child: Center(
+                  child: GlassProgressIndicator.circular(size: 28),
                 ),
               ),
-            ),
+            ],
+          ),
+          error: (error, _) => Column(
+            children: [
+              const SizedBox(height: kAppBarClearance),
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Text(
+                      error.toString().replaceFirst('Exception: ', ''),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: CupertinoColors.secondaryLabel,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           data: (plan) => _buildBody(plan),
         ),
@@ -213,6 +235,7 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
       children: [
+        const SizedBox(height: kAppBarClearance),
         GlassCard(
           padding: const EdgeInsets.all(18),
           child: Column(
