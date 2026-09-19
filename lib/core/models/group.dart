@@ -22,9 +22,7 @@ class Group {
     return Group(
       id: int.tryParse('${json['id']}') ?? 0,
       name: (json['name'] ?? '').toString(),
-      description: json['description'] == null
-          ? null
-          : json['description'].toString(),
+      description: json['description']?.toString(),
       inviteCode: (json['invite_code'] ?? '').toString(),
       role: (json['role'] ?? 'member').toString(),
       memberCount: int.tryParse('${json['member_count']}') ?? 0,

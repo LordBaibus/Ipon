@@ -62,7 +62,8 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
       return;
     }
 
-    setState(() => _categories = template.allocate(_targetAmount));
+    final chosen = template;
+    setState(() => _categories = chosen.allocate(_targetAmount));
   }
 
   Future<void> _submit() async {
