@@ -93,9 +93,13 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
       category: _categoryController.text.trim(),
       expenseDate: date,
       notes: _notesController.text.trim(),
+      // Keeping the existing links; changing them is done from the
+      // plan screens, where the available budget lines are in view.
+      groupId: _expense.groupId,
       planId: _expense.planId,
       planCategoryId: _expense.planCategoryId,
       previousPlanId: _expense.planId,
+      previousGroupId: _expense.groupId,
     );
 
     if (!mounted) return;
