@@ -67,6 +67,7 @@ class ServerDisconnectionListener extends ConsumerWidget {
                   child: GlassButton.custom(
                     width: double.infinity,
                     height: 48,
+                    shape: const LiquidRoundedRectangle(borderRadius: 14),
                     onTap: () {
                       Navigator.of(dialogContext).pop();
                       ref.read(serverConfigProvider.notifier).resetToEntry();
