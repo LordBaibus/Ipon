@@ -6,6 +6,7 @@ import '../../core/models/group.dart';
 import '../../core/models/plan.dart';
 import '../../core/providers/groups_provider.dart';
 import '../../core/providers/plans_provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
 
 class PlanCreateScreen extends ConsumerStatefulWidget {
@@ -124,7 +125,17 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
 
     return GlassScaffold(
       statusBarStyle: GlassStatusBarStyle.auto,
-      appBar: GlassAppBar(title: const Text('New Plan')),
+      appBar: GlassAppBar(
+        title: const Text('New Plan'),
+        leading: GlassButton(
+          icon: const Icon(CupertinoIcons.back),
+          label: 'Back',
+          width: 40,
+          height: 40,
+          enabled: !_isSaving,
+          onTap: _isSaving ? () {} : () => Navigator.of(context).pop(),
+        ),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
@@ -135,7 +146,10 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
               placeholder: 'Plan name (e.g. Baguio Trip)',
               textInputAction: TextInputAction.next,
               enabled: !_isSaving,
-              prefixIcon: const Icon(CupertinoIcons.textformat),
+              prefixIcon: const Icon(
+                CupertinoIcons.textformat,
+                color: AppColors.moneyGreen,
+              ),
             ),
             const SizedBox(height: 10),
             GlassTextField(
@@ -144,7 +158,10 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               textInputAction: TextInputAction.next,
               enabled: !_isSaving,
-              prefixIcon: const Icon(CupertinoIcons.money_dollar),
+              prefixIcon: const Icon(
+                CupertinoIcons.money_dollar,
+                color: AppColors.moneyGreen,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
               ],
@@ -158,7 +175,10 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
               textInputAction: TextInputAction.done,
               enabled: !_isSaving,
               maxLength: 10,
-              prefixIcon: const Icon(CupertinoIcons.calendar),
+              prefixIcon: const Icon(
+                CupertinoIcons.calendar,
+                color: AppColors.moneyGreen,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
               ],
@@ -169,26 +189,32 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
             GlassGroupedSection(
               children: [
                 GlassListTile(
-                  leading: const Icon(CupertinoIcons.person),
+                  leading: const Icon(
+                    CupertinoIcons.person,
+                    color: AppColors.moneyGreen,
+                  ),
                   title: const Text('Just me'),
                   subtitle: const Text('A personal savings plan'),
                   trailing: _groupId == null
                       ? const Icon(
                     CupertinoIcons.checkmark_circle_fill,
-                    color: CupertinoColors.activeGreen,
+                    color: AppColors.moneyGreen,
                   )
                       : null,
                   onTap: _isSaving ? null : () => setState(() => _groupId = null),
                 ),
                 ...groups.map(
                       (group) => GlassListTile(
-                    leading: const Icon(CupertinoIcons.person_2_fill),
+                    leading: const Icon(
+                      CupertinoIcons.person_2_fill,
+                      color: AppColors.moneyGreen,
+                    ),
                     title: Text(group.name),
                     subtitle: Text(group.memberLabel),
                     trailing: _groupId == group.id
                         ? const Icon(
                       CupertinoIcons.checkmark_circle_fill,
-                      color: CupertinoColors.activeGreen,
+                      color: AppColors.moneyGreen,
                     )
                         : null,
                     onTap: _isSaving
@@ -205,10 +231,7 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
                   'You are not in any group yet. Personal plans work on '
                       'their own — join or create a group from the Groups tab '
                       'if you want to budget with other people.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: CupertinoColors.systemGrey2,
-                  ),
+                  style: AppTextStyles.caption,
                 ),
               ),
 
@@ -228,7 +251,7 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
                   trailing: _planType == template.key
                       ? const Icon(
                     CupertinoIcons.checkmark_circle_fill,
-                    color: CupertinoColors.activeGreen,
+                    color: AppColors.moneyGreen,
                   )
                       : null,
                   onTap: _isSaving
@@ -260,7 +283,7 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
                       'Reset to suggestion',
                       style: TextStyle(
                         fontSize: 13,
-                        color: CupertinoColors.activeBlue,
+                        color: AppColors.moneyGreen,
                       ),
                     ),
                   ),
@@ -272,10 +295,7 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
                 padding: EdgeInsets.symmetric(vertical: 12),
                 child: Text(
                   'Enter a target amount to see the suggested split.',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: CupertinoColors.systemGrey2,
-                  ),
+                  style: AppTextStyles.caption,
                 ),
               )
             else if (_categories.isEmpty)
@@ -284,10 +304,7 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
                 child: Text(
                   'This plan type starts with no categories. You can add '
                       'them after creating the plan.',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: CupertinoColors.systemGrey2,
-                  ),
+                  style: AppTextStyles.caption,
                 ),
               )
             else ...[
@@ -325,7 +342,7 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
                 children: [
                   const Icon(
                     CupertinoIcons.exclamationmark_circle,
-                    color: CupertinoColors.systemRed,
+                    color: AppColors.statusNegative,
                     size: 18,
                   ),
                   const SizedBox(width: 6),
@@ -333,7 +350,7 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
                     child: Text(
                       _errorMessage!,
                       style: const TextStyle(
-                        color: CupertinoColors.systemRed,
+                        color: AppColors.statusNegative,
                         fontSize: 13,
                       ),
                     ),
@@ -420,15 +437,12 @@ class _CategoryAmountRowState extends State<_CategoryAmountRow> {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: CupertinoColors.white,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
                   '${percent.toStringAsFixed(1)}% of target',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: CupertinoColors.systemGrey2,
-                  ),
+                  style: AppTextStyles.caption,
                 ),
               ],
             ),
@@ -468,6 +482,10 @@ class _AllocationSummary extends StatelessWidget {
     final isBalanced = difference.abs() < 0.01;
     final isOver = difference < -0.01;
 
+    final statusColor = isBalanced
+        ? AppColors.moneyGreen
+        : (isOver ? AppColors.statusNegative : AppColors.statusWarning);
+
     return GlassCard(
       padding: const EdgeInsets.all(14),
       child: Column(
@@ -475,16 +493,13 @@ class _AllocationSummary extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Allocated',
-                style: TextStyle(fontSize: 13, color: CupertinoColors.systemGrey2),
-              ),
+              const Text('Allocated', style: AppTextStyles.caption),
               Text(
                 '${formatPeso(allocated)} / ${formatPeso(target)}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: CupertinoColors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -497,11 +512,7 @@ class _AllocationSummary extends StatelessWidget {
                     ? CupertinoIcons.checkmark_circle_fill
                     : CupertinoIcons.exclamationmark_circle,
                 size: 16,
-                color: isBalanced
-                    ? CupertinoColors.activeGreen
-                    : (isOver
-                    ? CupertinoColors.systemRed
-                    : CupertinoColors.systemOrange),
+                color: statusColor,
               ),
               const SizedBox(width: 6),
               Expanded(
@@ -511,14 +522,7 @@ class _AllocationSummary extends StatelessWidget {
                       : isOver
                       ? 'Over the target by ${formatPeso(difference.abs())}.'
                       : '${formatPeso(difference)} not yet budgeted.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isBalanced
-                        ? CupertinoColors.activeGreen
-                        : (isOver
-                        ? CupertinoColors.systemRed
-                        : CupertinoColors.systemOrange),
-                  ),
+                  style: TextStyle(fontSize: 12, color: statusColor),
                 ),
               ),
             ],
@@ -538,15 +542,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text.toUpperCase(),
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-          color: CupertinoColors.systemGrey,
-        ),
-      ),
+      child: Text(text.toUpperCase(), style: AppTextStyles.sectionLabel),
     );
   }
 }
