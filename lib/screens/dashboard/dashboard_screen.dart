@@ -12,9 +12,15 @@ import '../../widgets/primary_glass_button.dart';
 import '../budget/budget_screen.dart';
 import '../expenses/expense_detail_screen.dart';
 
+// Kept for anything still importing these two constants elsewhere;
+// both now simply point at the shared theme tokens.
 const Color kChartAccent = AppColors.moneyGreen;
 const Color kChartTrack = Color(0x1AFFFFFF);
 
+/// Extra headroom reserved below the GlassAppBar so page content never
+/// starts underneath the floating title bar. Tuned to the app bar's
+/// own height plus a small gap; adjust here once if it ever needs to
+/// change, instead of on every screen separately.
 const double kAppBarClearance = 56;
 
 class DashboardScreen extends ConsumerWidget {
@@ -227,7 +233,9 @@ class _DashboardBody extends ConsumerWidget {
     );
   }
 }
-
+/// A compact summary of the personal budget's current pacing. The
+/// caller only places this once [Budget.hasBudget] is already true (see
+/// _SetBudgetPrompt for the alternative shown before a limit is set).
 class _BudgetPacingCard extends StatelessWidget {
   final Budget budget;
 
@@ -274,11 +282,24 @@ class _BudgetPacingCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            GlassProgressIndicator.linear(
-              value: pacing.limitAmount > 0
-                  ? (pacing.spentTotal / pacing.limitAmount).clamp(0, 1)
-                  : 0,
-              color: statusColor,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                height: 8,
+                color: kChartTrack,
+                child: FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: pacing.limitAmount > 0
+                      ? (pacing.spentTotal / pacing.limitAmount).clamp(0.0, 1.0)
+                      : 0.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 8),
             Row(
@@ -310,6 +331,9 @@ class _BudgetPacingCard extends StatelessWidget {
   }
 }
 
+/// Shown in the pacing card's place before the user has set a personal
+/// spending limit yet — a lightweight nudge rather than a blocking
+/// empty state, since the rest of the dashboard works fine without one.
 class _SetBudgetPrompt extends StatelessWidget {
   const _SetBudgetPrompt();
 
@@ -546,6 +570,8 @@ class _TrendColumn extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 color: fraction == 0 ? kChartTrack : AppColors.moneyGreen,
+                // Rounded top only: the column is anchored to its
+                // baseline, so the bottom stays square.
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(4),
                 ),
