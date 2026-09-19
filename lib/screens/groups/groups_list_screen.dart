@@ -7,6 +7,7 @@ import '../../core/providers/groups_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
 import '../dashboard/dashboard_screen.dart' show kAppBarClearance;
+import 'group_detail_screen.dart';
 
 class GroupsListScreen extends ConsumerWidget {
   const GroupsListScreen({super.key});
@@ -283,11 +284,25 @@ class _GroupsList extends ConsumerWidget {
             subtitle: Text(
               '${group.memberLabel} · Code: ${group.inviteCode}',
             ),
-            trailing: const Icon(
-              CupertinoIcons.ellipsis,
-              size: 18,
+            // The row itself opens the group's detail screen (members +
+            // plans); the ellipsis is its own tap target for the quick
+            // actions (copy invite code, leave), so neither gesture
+            // steals the other.
+            trailing: GestureDetector(
+              onTap: () => _showGroupActions(context, ref, group),
+              child: const Padding(
+                padding: EdgeInsets.all(6),
+                child: Icon(
+                  CupertinoIcons.ellipsis,
+                  size: 18,
+                ),
+              ),
             ),
-            onTap: () => _showGroupActions(context, ref, group),
+            onTap: () => Navigator.of(context).push(
+              CupertinoPageRoute(
+                builder: (_) => GroupDetailScreen(groupId: group.id),
+              ),
+            ),
           ))
               .toList(),
         ),
