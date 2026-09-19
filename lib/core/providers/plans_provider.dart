@@ -3,12 +3,7 @@ import '../models/plan.dart';
 import '../services/plans_service.dart';
 import 'auth_provider.dart';
 
-/// Which plans the list screen shows: 'all', 'personal', or 'group'.
 final planScopeProvider = StateProvider<String>((ref) => 'all');
-
-/// Plan templates. Kept separate from plansProvider because they never
-/// change during a session — the create screen reads this once and
-/// computes previews locally as the user types.
 final planTemplatesProvider = FutureProvider<List<PlanTemplate>>((ref) async {
   final auth = ref.watch(authProvider);
   if (!auth.isSignedIn || auth.token == null) return const <PlanTemplate>[];
@@ -122,8 +117,6 @@ class PlansNotifier extends AsyncNotifier<List<Plan>> {
 final plansProvider =
 AsyncNotifierProvider<PlansNotifier, List<Plan>>(PlansNotifier.new);
 
-/// One plan with its categories. `.family` means each plan id gets its
-/// own cached provider instance.
 final planDetailProvider =
 FutureProvider.family<Plan, int>((ref, planId) async {
   final auth = ref.watch(authProvider);
