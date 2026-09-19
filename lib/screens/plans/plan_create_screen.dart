@@ -8,6 +8,7 @@ import '../../core/providers/groups_provider.dart';
 import '../../core/providers/plans_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
+import '../dashboard/dashboard_screen.dart' show kAppBarClearance;
 
 class PlanCreateScreen extends ConsumerStatefulWidget {
   const PlanCreateScreen({super.key});
@@ -140,6 +141,7 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           children: [
+            const SizedBox(height: kAppBarClearance),
             const _SectionLabel('Plan details'),
             GlassTextField(
               controller: _nameController,
