@@ -6,6 +6,7 @@ import '../../core/models/expense.dart';
 import '../../core/models/plan.dart' show formatPeso;
 import '../../core/providers/expenses_provider.dart';
 import '../../widgets/primary_glass_button.dart';
+import '../dashboard/dashboard_screen.dart' show kAppBarClearance;
 
 class ExpenseDetailScreen extends ConsumerStatefulWidget {
   final Expense expense;
@@ -167,6 +168,14 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
       statusBarStyle: GlassStatusBarStyle.auto,
       appBar: GlassAppBar(
         title: const Text('Expense'),
+        leading: GlassButton(
+          icon: const Icon(CupertinoIcons.back),
+          label: 'Back',
+          width: 40,
+          height: 40,
+          enabled: !_isSaving,
+          onTap: _isSaving ? () {} : () => Navigator.of(context).pop(),
+        ),
         actions: [
           if (!_isEditing && _expense.isMine)
             GlassButton(
@@ -179,6 +188,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           children: [
+            const SizedBox(height: kAppBarClearance),
             if (_isEditing) ..._buildEditForm() else ..._buildReadOnly(),
 
             if (_errorMessage != null) ...[
