@@ -25,7 +25,7 @@ class GroupsListScreen extends ConsumerWidget {
               CupertinoIcons.add,
               color: AppColors.moneyGreen,
             ),
-            onTap: () => _showCreateSheet(context, ref),
+            onTap: () => _showAddOptions(context, ref),
           ),
         ],
       ),
@@ -53,6 +53,39 @@ class GroupsListScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// The '+' button's entry point: choose between creating a new group
+  /// or joining one with an invite code. Without this, "Join a Group"
+  /// was only reachable from the empty state, so it disappeared the
+  /// moment the user had at least one group.
+  void _showAddOptions(BuildContext context, WidgetRef ref) {
+    GlassDialog.show<void>(
+      context: context,
+      title: 'Add a Group',
+      barrierDismissible: true,
+      actions: [
+        GlassDialogAction(
+          label: 'Create a Group',
+          isPrimary: true,
+          onPressed: () {
+            Navigator.of(context).pop();
+            _showCreateSheet(context, ref);
+          },
+        ),
+        GlassDialogAction(
+          label: 'I Have an Invite Code',
+          onPressed: () {
+            Navigator.of(context).pop();
+            _showJoinSheet(context, ref);
+          },
+        ),
+        GlassDialogAction(
+          label: 'Cancel',
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ],
     );
   }
 
