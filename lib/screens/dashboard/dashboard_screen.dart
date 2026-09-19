@@ -5,11 +5,13 @@ import '../../core/models/dashboard.dart';
 import '../../core/models/plan.dart' show formatPeso;
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/dashboard_provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
 import '../expenses/expense_detail_screen.dart';
 
-const Color kChartAccent = CupertinoColors.activeGreen;
+const Color kChartAccent = AppColors.moneyGreen;
 const Color kChartTrack = Color(0x1AFFFFFF);
+const double kAppBarClearance = 56;
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -29,7 +31,10 @@ class DashboardScreen extends ConsumerWidget {
         title: const Text('Dashboard'),
         actions: [
           GlassButton(
-            icon: const Icon(CupertinoIcons.refresh),
+            icon: const Icon(
+              CupertinoIcons.refresh,
+              color: AppColors.moneyGreen,
+            ),
             onTap: () => ref.invalidate(dashboardProvider),
           ),
         ],
@@ -37,6 +42,7 @@ class DashboardScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
+            const SizedBox(height: kAppBarClearance),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
               child: GlassSegmentedControl(
@@ -96,10 +102,7 @@ class _DashboardBody extends StatelessWidget {
                 greetingName == null
                     ? 'Total spent'
                     : 'Total spent, $greetingName',
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: CupertinoColors.systemGrey2,
-                ),
+                style: AppTextStyles.caption,
               ),
               const SizedBox(height: 6),
               Text(
@@ -107,7 +110,7 @@ class _DashboardBody extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 38,
                   fontWeight: FontWeight.w700,
-                  color: kChartAccent,
+                  color: AppColors.moneyGreen,
                 ),
               ),
               const SizedBox(height: 14),
@@ -182,7 +185,7 @@ class _DashboardBody extends StatelessWidget {
                 expense.isFromReceipt
                     ? CupertinoIcons.doc_text_viewfinder
                     : CupertinoIcons.money_dollar_circle,
-                color: CupertinoColors.systemGrey,
+                color: AppColors.moneyGreen,
               ),
               title: Text(expense.displayTitle),
               subtitle: Text(
@@ -194,7 +197,7 @@ class _DashboardBody extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: CupertinoColors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
               onTap: () => Navigator.of(context).push(
@@ -227,16 +230,10 @@ class _StatTile extends StatelessWidget {
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: CupertinoColors.white,
+            color: AppColors.textPrimary,
           ),
         ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: CupertinoColors.systemGrey,
-          ),
-        ),
+        Text(label, style: AppTextStyles.caption),
       ],
     );
   }
@@ -264,7 +261,7 @@ class _CategoryBar extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: CupertinoColors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),
@@ -274,7 +271,7 @@ class _CategoryBar extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: CupertinoColors.white,
+                color: AppColors.textPrimary,
               ),
             ),
           ],
@@ -290,7 +287,7 @@ class _CategoryBar extends StatelessWidget {
               widthFactor: fraction,
               child: Container(
                 decoration: BoxDecoration(
-                  color: kChartAccent,
+                  color: AppColors.moneyGreen,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -301,10 +298,7 @@ class _CategoryBar extends StatelessWidget {
         Text(
           '${slice.sharePercent.toStringAsFixed(1)}% of spending'
               '${slice.count > 0 ? " · ${slice.count} ${slice.count == 1 ? "expense" : "expenses"}" : ""}',
-          style: const TextStyle(
-            fontSize: 11,
-            color: CupertinoColors.systemGrey,
-          ),
+          style: AppTextStyles.caption,
         ),
       ],
     );
@@ -355,7 +349,7 @@ class _MonthlyTrend extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 10,
-                    color: CupertinoColors.systemGrey,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -394,7 +388,7 @@ class _TrendColumn extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
-                color: CupertinoColors.systemGrey2,
+                color: AppColors.textSecondary,
               ),
             ),
           ),
@@ -404,7 +398,7 @@ class _TrendColumn extends StatelessWidget {
             heightFactor: fraction == 0 ? 0.02 : fraction,
             child: Container(
               decoration: BoxDecoration(
-                color: fraction == 0 ? kChartTrack : kChartAccent,
+                color: fraction == 0 ? kChartTrack : AppColors.moneyGreen,
                 // Rounded top only: the column is anchored to its
                 // baseline, so the bottom stays square.
                 borderRadius: const BorderRadius.vertical(
@@ -429,7 +423,7 @@ class _PlanMeter extends StatelessWidget {
     // the same thing.
     final isOver = plan.isOverspent;
     final statusColor =
-    isOver ? CupertinoColors.systemRed : CupertinoColors.systemGrey2;
+    isOver ? AppColors.statusNegative : AppColors.textSecondary;
 
     return GlassCard(
       padding: const EdgeInsets.all(16),
@@ -446,17 +440,11 @@ class _PlanMeter extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: CupertinoColors.white,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
-              Text(
-                plan.scopeLabel,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: CupertinoColors.systemGrey,
-                ),
-              ),
+              Text(plan.scopeLabel, style: AppTextStyles.caption),
             ],
           ),
           const SizedBox(height: 10),
@@ -470,7 +458,9 @@ class _PlanMeter extends StatelessWidget {
                 widthFactor: plan.progress,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isOver ? CupertinoColors.systemRed : kChartAccent,
+                    color: isOver
+                        ? AppColors.statusNegative
+                        : AppColors.moneyGreen,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -485,7 +475,7 @@ class _PlanMeter extends StatelessWidget {
                 const Icon(
                   CupertinoIcons.exclamationmark_triangle_fill,
                   size: 13,
-                  color: CupertinoColors.systemRed,
+                  color: AppColors.statusNegative,
                 ),
                 const SizedBox(width: 5),
               ],
@@ -523,26 +513,19 @@ class _DashboardEmpty extends StatelessWidget {
             Icon(
               CupertinoIcons.chart_bar,
               size: 56,
-              color: CupertinoColors.systemGrey,
+              color: AppColors.moneyGreen,
             ),
             SizedBox(height: 16),
             Text(
               'Nothing to chart yet',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: CupertinoColors.label,
-              ),
+              style: AppTextStyles.screenTitle,
             ),
             SizedBox(height: 8),
             Text(
               'Once you log a few expenses, this is where you will see '
                   'where your money goes and how your plans are tracking.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel,
-              ),
+              style: AppTextStyles.caption,
             ),
           ],
         ),
@@ -568,17 +551,10 @@ class _DashboardError extends StatelessWidget {
             const Icon(
               CupertinoIcons.exclamationmark_triangle,
               size: 48,
-              color: CupertinoColors.systemOrange,
+              color: AppColors.statusWarning,
             ),
             const SizedBox(height: 16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel,
-              ),
-            ),
+            Text(message, textAlign: TextAlign.center, style: AppTextStyles.caption),
             const SizedBox(height: 20),
             PrimaryGlassButton(
               label: 'Try Again',
@@ -601,15 +577,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: Text(
-        text.toUpperCase(),
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-          color: CupertinoColors.systemGrey,
-        ),
-      ),
+      child: Text(text.toUpperCase(), style: AppTextStyles.sectionLabel),
     );
   }
 }
