@@ -10,6 +10,7 @@ import '../../core/providers/expenses_provider.dart';
 import '../../core/providers/groups_provider.dart';
 import '../../core/providers/plans_provider.dart';
 import '../../core/services/ocr_service.dart';
+import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
 
 class ExpenseCreateScreen extends ConsumerStatefulWidget {
@@ -159,7 +160,7 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: CupertinoColors.white,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -171,7 +172,7 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
                       style: const TextStyle(
                         fontSize: 12,
                         height: 1.4,
-                        color: CupertinoColors.systemGrey2,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -247,7 +248,17 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
 
     return GlassScaffold(
       statusBarStyle: GlassStatusBarStyle.auto,
-      appBar: GlassAppBar(title: const Text('Add Expense')),
+      appBar: GlassAppBar(
+        title: const Text('Add Expense'),
+        leading: GlassButton(
+          icon: const Icon(CupertinoIcons.back),
+          label: 'Back',
+          width: 40,
+          height: 40,
+          enabled: !_isSaving,
+          onTap: _isSaving ? () {} : () => Navigator.of(context).pop(),
+        ),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
@@ -262,10 +273,7 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
             const Text(
               'Reads the receipt on your phone. The photo is never uploaded.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11,
-                color: CupertinoColors.systemGrey,
-              ),
+              style: AppTextStyles.caption,
             ),
 
             if (_scanResult != null) ...[
@@ -283,7 +291,10 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               textInputAction: TextInputAction.next,
               enabled: !_isSaving,
-              prefixIcon: const Icon(CupertinoIcons.money_dollar),
+              prefixIcon: const Icon(
+                CupertinoIcons.money_dollar,
+                color: AppColors.moneyGreen,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
               ],
@@ -294,7 +305,10 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
               placeholder: 'Merchant or description (optional)',
               textInputAction: TextInputAction.next,
               enabled: !_isSaving,
-              prefixIcon: const Icon(CupertinoIcons.cart),
+              prefixIcon: const Icon(
+                CupertinoIcons.cart,
+                color: AppColors.moneyGreen,
+              ),
             ),
             const SizedBox(height: 10),
             GlassTextField(
@@ -304,7 +318,10 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
               textInputAction: TextInputAction.next,
               enabled: !_isSaving,
               maxLength: 10,
-              prefixIcon: const Icon(CupertinoIcons.calendar),
+              prefixIcon: const Icon(
+                CupertinoIcons.calendar,
+                color: AppColors.moneyGreen,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
               ],
@@ -315,7 +332,10 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
               placeholder: 'Notes (optional)',
               textInputAction: TextInputAction.done,
               enabled: !_isSaving,
-              prefixIcon: const Icon(CupertinoIcons.text_alignleft),
+              prefixIcon: const Icon(
+                CupertinoIcons.text_alignleft,
+                color: AppColors.moneyGreen,
+              ),
             ),
             const SizedBox(height: 22),
             const _Label('Category'),
@@ -323,7 +343,10 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
               controller: _categoryController,
               placeholder: 'e.g. Groceries',
               enabled: !_isSaving,
-              prefixIcon: const Icon(CupertinoIcons.tag),
+              prefixIcon: const Icon(
+                CupertinoIcons.tag,
+                color: AppColors.moneyGreen,
+              ),
             ),
             const SizedBox(height: 10),
             Wrap(
@@ -347,25 +370,31 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
             GlassGroupedSection(
               children: [
                 GlassListTile(
-                  leading: const Icon(CupertinoIcons.person),
+                  leading: const Icon(
+                    CupertinoIcons.person,
+                    color: AppColors.moneyGreen,
+                  ),
                   title: const Text('Just me'),
                   subtitle: const Text('A personal expense'),
                   trailing: _groupId == null
                       ? const Icon(
                     CupertinoIcons.checkmark_circle_fill,
-                    color: CupertinoColors.activeGreen,
+                    color: AppColors.moneyGreen,
                   )
                       : null,
                   onTap: _isSaving ? null : () => setState(() => _groupId = null),
                 ),
                 ...groups.map(
                       (group) => GlassListTile(
-                    leading: const Icon(CupertinoIcons.person_2_fill),
+                    leading: const Icon(
+                      CupertinoIcons.person_2_fill,
+                      color: AppColors.moneyGreen,
+                    ),
                     title: Text(group.name),
                     trailing: _groupId == group.id
                         ? const Icon(
                       CupertinoIcons.checkmark_circle_fill,
-                      color: CupertinoColors.activeGreen,
+                      color: AppColors.moneyGreen,
                     )
                         : null,
                     onTap: _isSaving
@@ -380,12 +409,15 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
             GlassGroupedSection(
               children: [
                 GlassListTile(
-                  leading: const Icon(CupertinoIcons.minus_circle),
+                  leading: const Icon(
+                    CupertinoIcons.minus_circle,
+                    color: AppColors.moneyGreen,
+                  ),
                   title: const Text('Not linked to a plan'),
                   trailing: _planId == null
                       ? const Icon(
                     CupertinoIcons.checkmark_circle_fill,
-                    color: CupertinoColors.activeGreen,
+                    color: AppColors.moneyGreen,
                   )
                       : null,
                   onTap: _isSaving
@@ -401,13 +433,14 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
                       plan.isPersonal
                           ? CupertinoIcons.person
                           : CupertinoIcons.person_2_fill,
+                      color: AppColors.moneyGreen,
                     ),
                     title: Text(plan.name),
                     subtitle: Text(plan.scopeLabel),
                     trailing: _planId == plan.id
                         ? const Icon(
                       CupertinoIcons.checkmark_circle_fill,
-                      color: CupertinoColors.activeGreen,
+                      color: AppColors.moneyGreen,
                     )
                         : null,
                     onTap: _isSaving
@@ -433,7 +466,7 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
                   trailing: _planCategoryId == category.id
                       ? const Icon(
                     CupertinoIcons.checkmark_circle_fill,
-                    color: CupertinoColors.activeGreen,
+                    color: AppColors.moneyGreen,
                   )
                       : null,
                   onTap: _isSaving
@@ -456,7 +489,7 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
                 children: [
                   const Icon(
                     CupertinoIcons.exclamationmark_circle,
-                    color: CupertinoColors.systemRed,
+                    color: AppColors.statusNegative,
                     size: 18,
                   ),
                   const SizedBox(width: 6),
@@ -464,7 +497,7 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
                     child: Text(
                       _errorMessage!,
                       style: const TextStyle(
-                        color: CupertinoColors.systemRed,
+                        color: AppColors.statusNegative,
                         fontSize: 13,
                       ),
                     ),
@@ -509,8 +542,8 @@ class _ScanSummary extends StatelessWidget {
                     : CupertinoIcons.exclamationmark_triangle_fill,
                 size: 18,
                 color: result.foundAnything
-                    ? CupertinoColors.activeGreen
-                    : CupertinoColors.systemOrange,
+                    ? AppColors.moneyGreen
+                    : AppColors.statusWarning,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -521,7 +554,7 @@ class _ScanSummary extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: CupertinoColors.white,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -531,7 +564,7 @@ class _ScanSummary extends StatelessWidget {
                   'View text',
                   style: TextStyle(
                     fontSize: 12,
-                    color: CupertinoColors.activeBlue,
+                    color: AppColors.moneyGreen,
                   ),
                 ),
               ),
@@ -544,7 +577,7 @@ class _ScanSummary extends StatelessWidget {
                   'the receipt was used. Double-check it.',
               style: TextStyle(
                 fontSize: 12,
-                color: CupertinoColors.systemOrange,
+                color: AppColors.statusWarning,
               ),
             ),
           ],
@@ -576,9 +609,7 @@ class _CategoryChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
-            color: selected
-                ? CupertinoColors.activeGreen
-                : CupertinoColors.white,
+            color: selected ? AppColors.moneyGreen : AppColors.textPrimary,
           ),
         ),
       ),
@@ -595,15 +626,7 @@ class _Label extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text.toUpperCase(),
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-          color: CupertinoColors.systemGrey,
-        ),
-      ),
+      child: Text(text.toUpperCase(), style: AppTextStyles.sectionLabel),
     );
   }
 }
