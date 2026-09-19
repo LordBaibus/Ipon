@@ -1,16 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import '../../core/models/budget.dart';
 import '../../core/models/dashboard.dart';
 import '../../core/models/plan.dart' show formatPeso;
 import '../../core/providers/auth_provider.dart';
+import '../../core/providers/budgets_provider.dart';
 import '../../core/providers/dashboard_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
+import '../budget/budget_screen.dart';
 import '../expenses/expense_detail_screen.dart';
 
+// Kept for anything still importing these two constants elsewhere;
+// both now simply point at the shared theme tokens.
 const Color kChartAccent = AppColors.moneyGreen;
 const Color kChartTrack = Color(0x1AFFFFFF);
+
+/// Extra headroom reserved below the GlassAppBar so page content never
+/// starts underneath the floating title bar. Tuned to the app bar's
+/// own height plus a small gap; adjust here once if it ever needs to
+/// change, instead of on every screen separately.
 const double kAppBarClearance = 56;
 
 class DashboardScreen extends ConsumerWidget {
@@ -82,17 +92,26 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-class _DashboardBody extends StatelessWidget {
+class _DashboardBody extends ConsumerWidget {
   final DashboardSummary summary;
   final String? greetingName;
 
   const _DashboardBody({required this.summary, this.greetingName});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final budgetAsync = ref.watch(personalBudgetProvider);
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 110),
       children: [
+        if (budgetAsync.value != null) ...[
+          _BudgetPacingCard(budget: budgetAsync.value!),
+          const SizedBox(height: 22),
+        ] else if (!budgetAsync.isLoading) ...[
+          const _SetBudgetPrompt(),
+          const SizedBox(height: 22),
+        ],
         GlassCard(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -214,6 +233,145 @@ class _DashboardBody extends StatelessWidget {
     );
   }
 }
+/// A compact summary of the personal budget's current pacing. The
+/// caller only places this once [Budget.hasBudget] is already true (see
+/// _SetBudgetPrompt for the alternative shown before a limit is set).
+class _BudgetPacingCard extends StatelessWidget {
+  final Budget budget;
+
+  const _BudgetPacingCard({required this.budget});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!budget.hasBudget || budget.pacing == null) {
+      return const SizedBox.shrink();
+    }
+
+    final pacing = budget.pacing!;
+    final cycleWindow = pacing.cycleToDate;
+    final isOver = cycleWindow.isOver;
+    final statusColor = isOver ? AppColors.statusNegative : AppColors.moneyGreen;
+
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        CupertinoPageRoute(builder: (_) => const BudgetScreen()),
+      ),
+      child: GlassCard(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Personal budget', style: AppTextStyles.caption),
+                const Icon(
+                  CupertinoIcons.chevron_forward,
+                  size: 14,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${formatPeso(pacing.spentTotal)} / ${formatPeso(pacing.limitAmount)}',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 10),
+            GlassProgressIndicator.linear(
+              value: pacing.limitAmount > 0
+                  ? (pacing.spentTotal / pacing.limitAmount).clamp(0, 1)
+                  : 0,
+              color: statusColor,
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  isOver
+                      ? CupertinoIcons.arrow_up_circle_fill
+                      : CupertinoIcons.arrow_down_circle_fill,
+                  size: 14,
+                  color: statusColor,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  isOver
+                      ? '${cycleWindow.percentVsPace.abs().toStringAsFixed(0)}% over pace this cycle'
+                      : '${cycleWindow.percentVsPace.abs().toStringAsFixed(0)}% under pace this cycle',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: statusColor,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown in the pacing card's place before the user has set a personal
+/// spending limit yet — a lightweight nudge rather than a blocking
+/// empty state, since the rest of the dashboard works fine without one.
+class _SetBudgetPrompt extends StatelessWidget {
+  const _SetBudgetPrompt();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        CupertinoPageRoute(builder: (_) => const BudgetScreen()),
+      ),
+      child: GlassCard(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            const Icon(
+              CupertinoIcons.chart_pie_fill,
+              color: AppColors.moneyGreen,
+              size: 28,
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Set a monthly budget',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Track your spending pace against a limit you choose.',
+                    style: AppTextStyles.caption,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              CupertinoIcons.chevron_forward,
+              size: 16,
+              color: AppColors.textSecondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _StatTile extends StatelessWidget {
   final String value;
   final String label;
