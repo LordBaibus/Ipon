@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'core/providers/auth_provider.dart';
+import 'core/theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
-import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/dashboard/dashboard_screen.dart' show DashboardScreen, kAppBarClearance;
 import 'screens/expenses/expenses_list_screen.dart';
 import 'screens/groups/groups_list_screen.dart';
 import 'screens/plans/plans_list_screen.dart';
@@ -132,10 +133,25 @@ class ProfileScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
           children: [
-            const Icon(
-              CupertinoIcons.person_crop_circle_fill,
-              size: 72,
-              color: CupertinoColors.activeBlue,
+            const SizedBox(height: kAppBarClearance),
+            Container(
+              width: 88,
+              height: 88,
+              alignment: Alignment.center,
+              margin: const EdgeInsets.symmetric(horizontal: 0),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: AppColors.heroGradient,
+                ),
+              ),
+              child: const Icon(
+                CupertinoIcons.person_crop_circle_fill,
+                size: 56,
+                color: CupertinoColors.black,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -144,17 +160,14 @@ class ProfileScreen extends ConsumerWidget {
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: CupertinoColors.label,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               user?.email ?? '',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel,
-              ),
+              style: AppTextStyles.caption,
             ),
             const SizedBox(height: 28),
             GlassGroupedSection(
@@ -162,7 +175,7 @@ class ProfileScreen extends ConsumerWidget {
                 GlassListTile(
                   leading: const Icon(
                     CupertinoIcons.square_arrow_right,
-                    color: CupertinoColors.systemRed,
+                    color: AppColors.statusNegative,
                   ),
                   title: const Text('Sign Out'),
                   onTap: () => _confirmSignOut(context, ref),
