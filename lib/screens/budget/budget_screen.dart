@@ -4,11 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../../core/models/budget.dart';
 import '../../core/models/group.dart';
+import '../../core/models/plan.dart' show formatPeso;
 import '../../core/providers/budgets_provider.dart';
 import '../../core/providers/groups_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
-import '../dashboard/dashboard_screen.dart' show kAppBarClearance;
+import '../dashboard/dashboard_screen.dart' show kAppBarClearance, kChartTrack;
 
 class BudgetScreen extends ConsumerStatefulWidget {
   const BudgetScreen({super.key});
@@ -39,54 +40,61 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         ),
       ),
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () =>
-              ref.read(budgetProvider(_selectedGroupId).notifier).refresh(),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
-            children: [
-              const SizedBox(height: kAppBarClearance),
-              const _SectionLabel('Scope'),
-              GlassGroupedSection(
-                children: [
-                  GlassListTile(
-                    leading: const Icon(
-                      CupertinoIcons.person,
-                      color: AppColors.moneyGreen,
-                    ),
-                    title: const Text('Personal'),
-                    subtitle: const Text('Your own spending limit'),
-                    trailing: _selectedGroupId == null
-                        ? const Icon(
-                      CupertinoIcons.checkmark_circle_fill,
-                      color: AppColors.moneyGreen,
-                    )
-                        : null,
-                    onTap: () => setState(() => _selectedGroupId = null),
-                  ),
-                  ...groups.map(
-                        (group) => GlassListTile(
-                      leading: const Icon(
-                        CupertinoIcons.person_2_fill,
-                        color: AppColors.moneyGreen,
+        child: CustomScrollView(
+          slivers: [
+            CupertinoSliverRefreshControl(
+              onRefresh: () =>
+                  ref.read(budgetProvider(_selectedGroupId).notifier).refresh(),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  const SizedBox(height: kAppBarClearance),
+                  const _SectionLabel('Scope'),
+                  GlassGroupedSection(
+                    children: [
+                      GlassListTile(
+                        leading: const Icon(
+                          CupertinoIcons.person,
+                          color: AppColors.moneyGreen,
+                        ),
+                        title: const Text('Personal'),
+                        subtitle: const Text('Your own spending limit'),
+                        trailing: _selectedGroupId == null
+                            ? const Icon(
+                          CupertinoIcons.checkmark_circle_fill,
+                          color: AppColors.moneyGreen,
+                        )
+                            : null,
+                        onTap: () => setState(() => _selectedGroupId = null),
                       ),
-                      title: Text(group.name),
-                      subtitle: Text(group.memberLabel),
-                      trailing: _selectedGroupId == group.id
-                          ? const Icon(
-                        CupertinoIcons.checkmark_circle_fill,
-                        color: AppColors.moneyGreen,
-                      )
-                          : null,
-                      onTap: () => setState(() => _selectedGroupId = group.id),
-                    ),
+                      ...groups.map(
+                            (group) => GlassListTile(
+                          leading: const Icon(
+                            CupertinoIcons.person_2_fill,
+                            color: AppColors.moneyGreen,
+                          ),
+                          title: Text(group.name),
+                          subtitle: Text(group.memberLabel),
+                          trailing: _selectedGroupId == group.id
+                              ? const Icon(
+                            CupertinoIcons.checkmark_circle_fill,
+                            color: AppColors.moneyGreen,
+                          )
+                              : null,
+                          onTap: () =>
+                              setState(() => _selectedGroupId = group.id),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                  const SizedBox(height: 22),
+                  _buildBudgetSection(budgetAsync),
+                ]),
               ),
-              const SizedBox(height: 22),
-              _buildBudgetSection(budgetAsync),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -219,7 +227,7 @@ class _BudgetContentState extends ConsumerState<_BudgetContent> {
           textInputAction: TextInputAction.next,
           enabled: !_isSaving,
           prefixIcon: const Icon(
-            CupertinoIcons.money_peso,
+            CupertinoIcons.money_dollar,
             color: AppColors.moneyGreen,
           ),
           inputFormatters: [
@@ -363,13 +371,26 @@ class _HeroCard extends StatelessWidget {
             style: AppTextStyles.heroValue,
           ),
           const SizedBox(height: 10),
-          GlassProgressIndicator.linear(
-            value: pacing.limitAmount > 0
-                ? (pacing.spentTotal / pacing.limitAmount).clamp(0, 1)
-                : 0,
-            color: pacing.isOverLimit
-                ? AppColors.statusNegative
-                : AppColors.moneyGreen,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              height: 8,
+              color: kChartTrack,
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: pacing.limitAmount > 0
+                    ? (pacing.spentTotal / pacing.limitAmount).clamp(0.0, 1.0)
+                    : 0.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: pacing.isOverLimit
+                        ? AppColors.statusNegative
+                        : AppColors.moneyGreen,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 14),
           Row(
