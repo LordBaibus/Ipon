@@ -95,6 +95,7 @@ class ExpenseActions {
     bool clearGroup = false,
     bool clearPlan = false,
     bool clearPlanCategory = false,
+    int? previousPlanId,
     int? previousGroupId,
   }) async {
     final token = _token;
@@ -166,10 +167,17 @@ class ExpenseActions {
     if (planId != null) {
       _ref.invalidate(planDetailProvider(planId));
     }
+
+    // A budget's pacing is computed live from expense totals, so both
+    // the current scope and (if different) the expense's previous scope
+    // need a fresh fetch.
     _ref.invalidate(budgetProvider(groupId));
     if (previousGroupId != groupId) {
       _ref.invalidate(budgetProvider(previousGroupId));
     }
+
+    // The plans list shows per-plan totals, and the dashboard shows
+    // spending across everything.
     _ref.read(plansProvider.notifier).refresh();
     await _ref.read(expenseLedgerProvider.notifier).refresh();
   }
@@ -178,7 +186,6 @@ class ExpenseActions {
 final expenseActionsProvider = Provider<ExpenseActions>((ref) {
   return ExpenseActions(ref);
 });
-
 const List<String> kExpenseCategorySuggestions = <String>[
   'Food',
   'Groceries',
