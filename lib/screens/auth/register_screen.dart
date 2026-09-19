@@ -96,103 +96,107 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 16),
-                const Text(
-                  'Start saving with Ipon',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'Start saving with Ipon',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Track your own expenses, or share a plan with your group.',
-                  style: AppTextStyles.caption,
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Track your own expenses, or share a plan with your group.',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.caption,
+                  ),
+                  const SizedBox(height: 24),
 
-                GlassTextField(
-                  controller: _nameController,
-                  placeholder: 'Full name',
-                  textInputAction: TextInputAction.next,
-                  enabled: !auth.isBusy,
-                  prefixIcon: const Icon(
-                    CupertinoIcons.person,
-                    color: AppColors.moneyGreen,
+                  GlassTextField(
+                    controller: _nameController,
+                    placeholder: 'Full name',
+                    textInputAction: TextInputAction.next,
+                    enabled: !auth.isBusy,
+                    prefixIcon: const Icon(
+                      CupertinoIcons.person,
+                      color: AppColors.moneyGreen,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                GlassTextField(
-                  controller: _emailController,
-                  placeholder: 'Email address',
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  enabled: !auth.isBusy,
-                  prefixIcon: const Icon(
-                    CupertinoIcons.mail,
-                    color: AppColors.moneyGreen,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                GlassPasswordField(
-                  controller: _passwordController,
-                  placeholder: 'Password (min. 8 characters)',
-                  enabled: !auth.isBusy,
-                  textInputAction: TextInputAction.next,
-                ),
-                const SizedBox(height: 12),
-                GlassPasswordField(
-                  controller: _confirmController,
-                  placeholder: 'Confirm password',
-                  enabled: !auth.isBusy,
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _submit(),
-                ),
-
-                if (_errorMessage != null) ...[
                   const SizedBox(height: 12),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        CupertinoIcons.exclamationmark_circle,
-                        color: AppColors.statusNegative,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          _errorMessage!,
-                          style: const TextStyle(
-                            color: AppColors.statusNegative,
-                            fontSize: 13,
+                  GlassTextField(
+                    controller: _emailController,
+                    placeholder: 'Email address',
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    enabled: !auth.isBusy,
+                    prefixIcon: const Icon(
+                      CupertinoIcons.mail,
+                      color: AppColors.moneyGreen,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GlassPasswordField(
+                    controller: _passwordController,
+                    placeholder: 'Password (min. 8 characters)',
+                    enabled: !auth.isBusy,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  const SizedBox(height: 12),
+                  GlassPasswordField(
+                    controller: _confirmController,
+                    placeholder: 'Confirm password',
+                    enabled: !auth.isBusy,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (_) => _submit(),
+                  ),
+
+                  if (_errorMessage != null) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          CupertinoIcons.exclamationmark_circle,
+                          color: AppColors.statusNegative,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(
+                              color: AppColors.statusNegative,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                  ],
+
+                  const SizedBox(height: 20),
+                  PrimaryGlassButton(
+                    label: 'Create Account',
+                    icon: CupertinoIcons.person_add,
+                    isLoading: auth.isBusy,
+                    onPressed: _submit,
+                  ),
+                  const SizedBox(height: 8),
+                  SubtleGlassLink(
+                    label: 'Already have an account? Sign in',
+                    onPressed: auth.isBusy
+                        ? null
+                        : () => Navigator.of(context).pop(),
                   ),
                 ],
-
-                const SizedBox(height: 20),
-                PrimaryGlassButton(
-                  label: 'Create Account',
-                  icon: CupertinoIcons.person_add,
-                  isLoading: auth.isBusy,
-                  onPressed: _submit,
-                ),
-                const SizedBox(height: 8),
-                SubtleGlassLink(
-                  label: 'Already have an account? Sign in',
-                  onPressed: auth.isBusy
-                      ? null
-                      : () => Navigator.of(context).pop(),
-                ),
-              ],
+              ),
             ),
           ),
         ),
