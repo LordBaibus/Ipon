@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/group.dart';
+import '../models/group_detail.dart';
 import 'api_client.dart';
 
 class GroupActionResult {
@@ -41,6 +42,27 @@ class GroupsService {
         .whereType<Map>()
         .map((item) => Group.fromJson(Map<String, dynamic>.from(item)))
         .toList();
+  }
+  static Future<GroupDetail> fetchGroupDetail(
+      Ref ref,
+      String token, {
+        required int groupId,
+      }) async {
+    final res = await ApiClient.post(ref, '/groups/detail.php', {
+      'token': token,
+      'group_id': groupId,
+    });
+
+    if (!res.success) {
+      throw Exception(res.error ?? 'Could not load this group.');
+    }
+
+    final body = res.data;
+    if (body is! Map || body['data'] is! Map) {
+      return GroupDetail.empty();
+    }
+
+    return GroupDetail.fromJson(Map<String, dynamic>.from(body['data'] as Map));
   }
 
   static Future<GroupActionResult> createGroup(
