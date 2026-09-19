@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
 import 'verify_email_screen.dart';
 
@@ -104,17 +105,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   'Start saving with Ipon',
                   style: TextStyle(
                     fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.label,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 const Text(
                   'Track your own expenses, or share a plan with your group.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: CupertinoColors.secondaryLabel,
-                  ),
+                  style: AppTextStyles.caption,
                 ),
                 const SizedBox(height: 24),
 
@@ -123,7 +121,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   placeholder: 'Full name',
                   textInputAction: TextInputAction.next,
                   enabled: !auth.isBusy,
-                  prefixIcon: const Icon(CupertinoIcons.person),
+                  prefixIcon: const Icon(
+                    CupertinoIcons.person,
+                    color: AppColors.moneyGreen,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 GlassTextField(
@@ -132,7 +133,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   enabled: !auth.isBusy,
-                  prefixIcon: const Icon(CupertinoIcons.mail),
+                  prefixIcon: const Icon(
+                    CupertinoIcons.mail,
+                    color: AppColors.moneyGreen,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 GlassPasswordField(
@@ -157,7 +161,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     children: [
                       const Icon(
                         CupertinoIcons.exclamationmark_circle,
-                        color: CupertinoColors.systemRed,
+                        color: AppColors.statusNegative,
                         size: 18,
                       ),
                       const SizedBox(width: 6),
@@ -165,7 +169,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         child: Text(
                           _errorMessage!,
                           style: const TextStyle(
-                            color: CupertinoColors.systemRed,
+                            color: AppColors.statusNegative,
                             fontSize: 13,
                           ),
                         ),
