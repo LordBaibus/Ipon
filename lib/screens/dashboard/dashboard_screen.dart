@@ -34,6 +34,8 @@ class DashboardScreen extends ConsumerWidget {
     final scope = ref.watch(dashboardScopeProvider);
     final scopeIndex = _scopes.indexOf(scope).clamp(0, _scopes.length - 1);
     final user = ref.watch(currentUserProvider);
+    final budgetAsync = ref.watch(personalBudgetProvider);
+    final budgetValue = budgetAsync.value;
 
     return GlassScaffold(
       statusBarStyle: GlassStatusBarStyle.auto,
@@ -53,8 +55,26 @@ class DashboardScreen extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: kAppBarClearance),
+            // The personal budget card sits above the scope tabs and the
+            // expense summary on purpose: it shows regardless of scope,
+            // and regardless of whether there is any expense data yet to
+            // chart (an empty ledger still has a monthly limit to set).
+            //
+            // budgetAsync.value is a real Budget even when no limit has
+            // been set yet (Budget.empty()), so the branch below is
+            // decided by hasBudget, not by null-checking the object.
+            if (budgetValue != null && budgetValue.hasBudget)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: _BudgetPacingCard(budget: budgetValue),
+              )
+            else if (!budgetAsync.isLoading)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: _SetBudgetPrompt(),
+              ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: GlassSegmentedControl(
                 selectedIndex: scopeIndex,
                 onSegmentSelected: (index) {
