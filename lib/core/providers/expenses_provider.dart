@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/expenses_service.dart';
 import 'auth_provider.dart';
+import 'budgets_provider.dart';
 import 'plans_provider.dart';
 
 final expenseFiltersProvider =
 StateProvider<ExpenseFilters>((ref) => const ExpenseFilters());
-
 class ExpenseLedgerNotifier extends AsyncNotifier<ExpensePage> {
   @override
   Future<ExpensePage> build() async {
@@ -78,7 +78,7 @@ class ExpenseActions {
       planCategoryId: planCategoryId,
     );
 
-    if (result.ok) await _invalidateRelated(planId);
+    if (result.ok) await _invalidateRelated(planId, groupId);
     return result;
   }
 
@@ -95,7 +95,7 @@ class ExpenseActions {
     bool clearGroup = false,
     bool clearPlan = false,
     bool clearPlanCategory = false,
-    int? previousPlanId,
+    int? previousGroupId,
   }) async {
     final token = _token;
     if (token == null) {
@@ -126,7 +126,11 @@ class ExpenseActions {
       if (previousPlanId != null && previousPlanId != planId) {
         _ref.invalidate(planDetailProvider(previousPlanId));
       }
-      await _invalidateRelated(planId ?? previousPlanId);
+      await _invalidateRelated(
+        planId ?? previousPlanId,
+        groupId ?? previousGroupId,
+        previousGroupId,
+      );
     }
 
     return result;
@@ -135,6 +139,7 @@ class ExpenseActions {
   Future<ExpenseActionResult> deleteExpense({
     required int expenseId,
     int? planId,
+    int? groupId,
   }) async {
     final token = _token;
     if (token == null) {
@@ -150,19 +155,26 @@ class ExpenseActions {
       expenseId: expenseId,
     );
 
-    if (result.ok) await _invalidateRelated(planId);
+    if (result.ok) await _invalidateRelated(planId, groupId);
     return result;
   }
-  Future<void> _invalidateRelated(int? planId) async {
+  Future<void> _invalidateRelated(
+      int? planId, [
+        int? groupId,
+        int? previousGroupId,
+      ]) async {
     if (planId != null) {
       _ref.invalidate(planDetailProvider(planId));
     }
-    // The plans list shows per-plan totals, and the dashboard shows
-    // spending across everything.
+    _ref.invalidate(budgetProvider(groupId));
+    if (previousGroupId != groupId) {
+      _ref.invalidate(budgetProvider(previousGroupId));
+    }
     _ref.read(plansProvider.notifier).refresh();
     await _ref.read(expenseLedgerProvider.notifier).refresh();
   }
 }
+
 final expenseActionsProvider = Provider<ExpenseActions>((ref) {
   return ExpenseActions(ref);
 });
