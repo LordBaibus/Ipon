@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../../core/models/group.dart';
 import '../../core/providers/groups_provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
+import '../dashboard/dashboard_screen.dart' show kAppBarClearance;
 
 class GroupsListScreen extends ConsumerWidget {
   const GroupsListScreen({super.key});
@@ -19,26 +21,36 @@ class GroupsListScreen extends ConsumerWidget {
         title: const Text('Groups'),
         actions: [
           GlassButton(
-            icon: const Icon(CupertinoIcons.add),
+            icon: const Icon(
+              CupertinoIcons.add,
+              color: AppColors.moneyGreen,
+            ),
             onTap: () => _showCreateSheet(context, ref),
           ),
         ],
       ),
       body: SafeArea(
-        child: groupsAsync.when(
-          loading: () => const Center(
-            child: GlassProgressIndicator.circular(size: 28),
-          ),
-          error: (error, _) => _ErrorState(
-            message: error.toString().replaceFirst('Exception: ', ''),
-            onRetry: () => ref.read(groupsProvider.notifier).refresh(),
-          ),
-          data: (groups) => groups.isEmpty
-              ? _EmptyState(
-            onCreate: () => _showCreateSheet(context, ref),
-            onJoin: () => _showJoinSheet(context, ref),
-          )
-              : _GroupsList(groups: groups),
+        child: Column(
+          children: [
+            const SizedBox(height: kAppBarClearance),
+            Expanded(
+              child: groupsAsync.when(
+                loading: () => const Center(
+                  child: GlassProgressIndicator.circular(size: 28),
+                ),
+                error: (error, _) => _ErrorState(
+                  message: error.toString().replaceFirst('Exception: ', ''),
+                  onRetry: () => ref.read(groupsProvider.notifier).refresh(),
+                ),
+                data: (groups) => groups.isEmpty
+                    ? _EmptyState(
+                  onCreate: () => _showCreateSheet(context, ref),
+                  onJoin: () => _showJoinSheet(context, ref),
+                )
+                    : _GroupsList(groups: groups),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -66,7 +78,7 @@ class GroupsListScreen extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: CupertinoColors.white,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -139,17 +151,14 @@ class GroupsListScreen extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: CupertinoColors.white,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 6),
                 const Text(
                   'Ask a member for the 8-character invite code.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: CupertinoColors.systemGrey2,
-                  ),
+                  style: AppTextStyles.caption,
                 ),
                 const SizedBox(height: 16),
                 GlassTextField(
@@ -161,7 +170,10 @@ class GroupsListScreen extends ConsumerWidget {
                     UpperCaseTextFormatter(),
                     FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9]')),
                   ],
-                  prefixIcon: const Icon(CupertinoIcons.person_2),
+                  prefixIcon: const Icon(
+                    CupertinoIcons.person_2,
+                    color: AppColors.moneyGreen,
+                  ),
                 ),
                 const SizedBox(height: 18),
                 PrimaryGlassButton(
@@ -231,8 +243,8 @@ class _GroupsList extends ConsumerWidget {
                   ? CupertinoIcons.star_fill
                   : CupertinoIcons.person_2_fill,
               color: group.isOwner
-                  ? CupertinoColors.systemYellow
-                  : CupertinoColors.activeBlue,
+                  ? AppColors.statusWarning
+                  : AppColors.moneyGreen,
             ),
             title: Text(group.name),
             subtitle: Text(
@@ -316,27 +328,17 @@ class _EmptyState extends StatelessWidget {
             const Icon(
               CupertinoIcons.person_2,
               size: 56,
-              color: CupertinoColors.systemGrey,
+              color: AppColors.moneyGreen,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No groups yet',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: CupertinoColors.label,
-              ),
-            ),
+            const Text('No groups yet', style: AppTextStyles.screenTitle),
             const SizedBox(height: 8),
             const Text(
               'Groups are optional. You can track your own plans and '
                   'expenses on your own, or make a group to split costs '
                   'with family, housemates, or your barkada.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel,
-              ),
+              style: AppTextStyles.caption,
             ),
             const SizedBox(height: 24),
             PrimaryGlassButton(
@@ -372,17 +374,10 @@ class _ErrorState extends StatelessWidget {
             const Icon(
               CupertinoIcons.exclamationmark_triangle,
               size: 48,
-              color: CupertinoColors.systemOrange,
+              color: AppColors.statusWarning,
             ),
             const SizedBox(height: 16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel,
-              ),
-            ),
+            Text(message, textAlign: TextAlign.center, style: AppTextStyles.caption),
             const SizedBox(height: 20),
             PrimaryGlassButton(
               label: 'Try Again',
