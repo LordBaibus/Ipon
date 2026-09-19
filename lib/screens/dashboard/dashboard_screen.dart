@@ -101,12 +101,16 @@ class _DashboardBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final budgetAsync = ref.watch(personalBudgetProvider);
+    final budgetValue = budgetAsync.value;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 110),
       children: [
-        if (budgetAsync.value != null) ...[
-          _BudgetPacingCard(budget: budgetAsync.value!),
+        // budgetAsync.value is a real Budget even when no limit has been
+        // set yet (Budget.empty()), so the branch here is decided by
+        // hasBudget, not by null-checking the object itself.
+        if (budgetValue != null && budgetValue.hasBudget) ...[
+          _BudgetPacingCard(budget: budgetValue),
           const SizedBox(height: 22),
         ] else if (!budgetAsync.isLoading) ...[
           const _SetBudgetPrompt(),
