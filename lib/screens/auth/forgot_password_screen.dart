@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -97,13 +98,28 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     Navigator.of(context).pop();
   }
 
+  void _backToLogin() {
+    FocusScope.of(context).unfocus();
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
 
     return GlassScaffold(
       statusBarStyle: GlassStatusBarStyle.auto,
-      appBar: GlassAppBar(title: const Text('Reset Password')),
+      appBar: GlassAppBar(
+        title: const Text('Reset Password'),
+        leading: GlassButton(
+          icon: const Icon(CupertinoIcons.back),
+          label: 'Back to sign in',
+          width: 40,
+          height: 40,
+          onTap: auth.isBusy ? () {} : _backToLogin,
+          enabled: !auth.isBusy,
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -113,12 +129,21 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(
-                    _codeSent
-                        ? CupertinoIcons.lock_rotation
-                        : CupertinoIcons.question_circle,
-                    size: 56,
-                    color: CupertinoColors.activeBlue,
+                  Container(
+                    width: 88,
+                    height: 88,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.moneyGreenTint,
+                    ),
+                    child: Icon(
+                      _codeSent
+                          ? CupertinoIcons.lock_rotation
+                          : CupertinoIcons.question_circle,
+                      size: 44,
+                      color: AppColors.moneyGreen,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -126,8 +151,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: CupertinoColors.label,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -136,10 +161,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         ? 'Enter the code we sent you, then choose a new password.'
                         : 'Enter your email and we will send you a reset code.',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: CupertinoColors.secondaryLabel,
-                    ),
+                    style: AppTextStyles.caption,
                   ),
                   const SizedBox(height: 28),
 
@@ -149,7 +171,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.done,
                     enabled: !auth.isBusy && !_codeSent,
-                    prefixIcon: const Icon(CupertinoIcons.mail),
+                    prefixIcon: const Icon(
+                      CupertinoIcons.mail,
+                      color: AppColors.moneyGreen,
+                    ),
                     onSubmitted: (_) => _codeSent ? null : _requestCode(),
                   ),
 
@@ -163,7 +188,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       enabled: !auth.isBusy,
                       maxLength: 6,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      prefixIcon: const Icon(CupertinoIcons.number),
+                      prefixIcon: const Icon(
+                        CupertinoIcons.number,
+                        color: AppColors.moneyGreen,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     GlassPasswordField(
@@ -182,7 +210,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       children: [
                         const Icon(
                           CupertinoIcons.exclamationmark_circle,
-                          color: CupertinoColors.systemRed,
+                          color: AppColors.statusNegative,
                           size: 18,
                         ),
                         const SizedBox(width: 6),
@@ -190,7 +218,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           child: Text(
                             _errorMessage!,
                             style: const TextStyle(
-                              color: CupertinoColors.systemRed,
+                              color: AppColors.statusNegative,
                               fontSize: 13,
                             ),
                           ),
@@ -221,6 +249,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         _passwordController.clear();
                       }),
                     ),
+
+                  const SizedBox(height: 4),
+                  SubtleGlassLink(
+                    label: 'Back to Sign In',
+                    onPressed: auth.isBusy ? null : _backToLogin,
+                  ),
                 ],
               ),
             ),
