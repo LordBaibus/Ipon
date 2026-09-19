@@ -28,9 +28,11 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
   final _categoryController = TextEditingController();
   final _dateController = TextEditingController();
   final _notesController = TextEditingController();
+
   int? _groupId;
   int? _planId;
   int? _planCategoryId;
+
   bool _isSaving = false;
   bool _isScanning = false;
   String? _errorMessage;
@@ -40,12 +42,10 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
   void initState() {
     super.initState();
     _planId = widget.initialPlanId;
-    // Default to today, in the YYYY-MM-DD the API expects.
     final now = DateTime.now();
     _dateController.text =
     '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
-
   @override
   void dispose() {
     _amountController.dispose();
@@ -96,7 +96,6 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
       final file = await picker.pickImage(source: source, imageQuality: 90);
 
       if (file == null) {
-        // The user backed out of the camera — not an error.
         if (mounted) setState(() => _isScanning = false);
         return;
       }
@@ -415,16 +414,14 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
                         ? null
                         : () => setState(() {
                       _planId = plan.id;
-                      // The old category belongs to a different
-                      // plan, so it cannot carry over.
                       _planCategoryId = null;
-                      // A group plan implies its own group.
                       if (!plan.isPersonal) _groupId = plan.groupId;
                     }),
                   ),
                 ),
               ],
             ),
+
             if (_planId != null && categories.isNotEmpty) ...[
               const SizedBox(height: 22),
               const _Label('Budget line (optional)'),
