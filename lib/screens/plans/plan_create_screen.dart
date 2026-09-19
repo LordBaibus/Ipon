@@ -119,6 +119,17 @@ class _PlanCreateScreenState extends ConsumerState<PlanCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Templates usually finish loading right after the screen opens.
+    // Without this listener, a target amount typed before that load
+    // completes never gets a suggested split — _recalculatePreview
+    // was only ever triggered by typing or picking a plan type, never
+    // by the templates themselves arriving. This recalculates the
+    // moment they do.
+    ref.listen(planTemplatesProvider, (previous, next) {
+      final loaded = next.value;
+      if (loaded != null) _recalculatePreview(loaded);
+    });
+
     final templatesAsync = ref.watch(planTemplatesProvider);
     final groupsAsync = ref.watch(groupsProvider);
     final templates = templatesAsync.value ?? const <PlanTemplate>[];
