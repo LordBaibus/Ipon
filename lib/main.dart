@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'core/providers/auth_provider.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/expenses/expenses_list_screen.dart';
 import 'screens/groups/groups_list_screen.dart';
+import 'screens/plans/plans_list_screen.dart';
 import 'screens/server_config_screen.dart';
 import 'screens/server_disconnected_dialog.dart';
 
@@ -37,7 +40,6 @@ class IponApp extends StatelessWidget {
     );
   }
 }
-
 class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 
@@ -57,7 +59,6 @@ class AuthGate extends ConsumerWidget {
     }
   }
 }
-
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
@@ -67,10 +68,11 @@ class HomeShell extends ConsumerStatefulWidget {
 
 class _HomeShellState extends ConsumerState<HomeShell> {
   int _selectedIndex = 0;
-  List<Widget> get _pages => const [
-    _PlansPlaceholder(),
+  static const List<Widget> _pages = [
+    DashboardScreen(),
+    PlansListScreen(),
+    ExpensesListScreen(),
     GroupsListScreen(),
-    _DashboardPlaceholder(),
     ProfileScreen(),
   ];
 
@@ -78,25 +80,33 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget build(BuildContext context) {
     return GlassScaffold(
       statusBarStyle: GlassStatusBarStyle.auto,
-      body: _pages[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
       bottomBar: GlassTabBar.bottom(
         selectedIndex: _selectedIndex,
         onTabSelected: (index) => setState(() => _selectedIndex = index),
         tabs: const [
+          GlassTab(
+            icon: Icon(CupertinoIcons.chart_bar),
+            activeIcon: Icon(CupertinoIcons.chart_bar_fill),
+            label: 'Summary',
+          ),
           GlassTab(
             icon: Icon(CupertinoIcons.chart_pie),
             activeIcon: Icon(CupertinoIcons.chart_pie_fill),
             label: 'Plans',
           ),
           GlassTab(
-            icon: Icon(CupertinoIcons.person_2),
-            activeIcon: Icon(CupertinoIcons.person_2_fill),
-            label: 'Groups',
-          ),
-          GlassTab(
             icon: Icon(CupertinoIcons.square_list),
             activeIcon: Icon(CupertinoIcons.square_list_fill),
             label: 'Expenses',
+          ),
+          GlassTab(
+            icon: Icon(CupertinoIcons.person_2),
+            activeIcon: Icon(CupertinoIcons.person_2_fill),
+            label: 'Groups',
           ),
           GlassTab(
             icon: Icon(CupertinoIcons.person_crop_circle),
@@ -108,7 +118,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     );
   }
 }
-
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -116,48 +125,52 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
 
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 24, 16, 100),
-        children: [
-          const Icon(
-            CupertinoIcons.person_crop_circle_fill,
-            size: 72,
-            color: CupertinoColors.activeBlue,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            user?.fullName ?? 'Signed in',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: CupertinoColors.label,
+    return GlassScaffold(
+      statusBarStyle: GlassStatusBarStyle.auto,
+      appBar: GlassAppBar(title: const Text('Profile')),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
+          children: [
+            const Icon(
+              CupertinoIcons.person_crop_circle_fill,
+              size: 72,
+              color: CupertinoColors.activeBlue,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            user?.email ?? '',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              color: CupertinoColors.secondaryLabel,
-            ),
-          ),
-          const SizedBox(height: 28),
-          GlassGroupedSection(
-            children: [
-              GlassListTile(
-                leading: const Icon(
-                  CupertinoIcons.square_arrow_right,
-                  color: CupertinoColors.systemRed,
-                ),
-                title: const Text('Sign Out'),
-                onTap: () => _confirmSignOut(context, ref),
+            const SizedBox(height: 12),
+            Text(
+              user?.fullName ?? 'Signed in',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: CupertinoColors.label,
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              user?.email ?? '',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: CupertinoColors.secondaryLabel,
+              ),
+            ),
+            const SizedBox(height: 28),
+            GlassGroupedSection(
+              children: [
+                GlassListTile(
+                  leading: const Icon(
+                    CupertinoIcons.square_arrow_right,
+                    color: CupertinoColors.systemRed,
+                  ),
+                  title: const Text('Sign Out'),
+                  onTap: () => _confirmSignOut(context, ref),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -182,74 +195,6 @@ class ProfileScreen extends ConsumerWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ],
-    );
-  }
-}
-
-class _PlansPlaceholder extends StatelessWidget {
-  const _PlansPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _Placeholder(
-      icon: CupertinoIcons.chart_pie,
-      title: 'Plans',
-      subtitle: 'Member 3 (Desmer) builds this screen.',
-    );
-  }
-}
-
-class _DashboardPlaceholder extends StatelessWidget {
-  const _DashboardPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _Placeholder(
-      icon: CupertinoIcons.square_list,
-      title: 'Expenses',
-      subtitle: 'Members 5 and 6 (Kath, Trisha) build these screens.',
-    );
-  }
-}
-
-class _Placeholder extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _Placeholder({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 56, color: CupertinoColors.systemGrey),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: CupertinoColors.label,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              color: CupertinoColors.secondaryLabel,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
