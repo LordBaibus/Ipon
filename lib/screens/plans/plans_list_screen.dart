@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../../core/models/plan.dart';
 import '../../core/providers/plans_provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
+import '../dashboard/dashboard_screen.dart' show kAppBarClearance;
 import 'plan_create_screen.dart';
 import 'plan_detail_screen.dart';
 
@@ -24,7 +26,10 @@ class PlansListScreen extends ConsumerWidget {
         title: const Text('Plans'),
         actions: [
           GlassButton(
-            icon: const Icon(CupertinoIcons.add),
+            icon: const Icon(
+              CupertinoIcons.add,
+              color: AppColors.moneyGreen,
+            ),
             onTap: () => Navigator.of(context).push(
               CupertinoPageRoute(builder: (_) => const PlanCreateScreen()),
             ),
@@ -34,6 +39,7 @@ class PlansListScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
+            const SizedBox(height: kAppBarClearance),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
               child: GlassSegmentedControl(
@@ -118,18 +124,12 @@ class _PlanCard extends StatelessWidget {
                       : CupertinoIcons.person_2_fill,
                   size: 16,
                   color: plan.isPersonal
-                      ? CupertinoColors.systemGrey
-                      : CupertinoColors.activeBlue,
+                      ? AppColors.textSecondary
+                      : AppColors.moneyGreen,
                 ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
-                    plan.scopeLabel,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: CupertinoColors.systemGrey2,
-                    ),
-                  ),
+                  child: Text(plan.scopeLabel, style: AppTextStyles.caption),
                 ),
                 if (remainingDays != null)
                   Text(
@@ -139,8 +139,8 @@ class _PlanCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       color: remainingDays >= 0
-                          ? CupertinoColors.systemGrey2
-                          : CupertinoColors.systemRed,
+                          ? AppColors.textSecondary
+                          : AppColors.statusNegative,
                     ),
                   ),
               ],
@@ -153,7 +153,7 @@ class _PlanCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: CupertinoColors.white,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 10),
@@ -165,19 +165,13 @@ class _PlanCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: CupertinoColors.activeGreen,
+                    color: AppColors.moneyGreen,
                   ),
                 ),
                 const SizedBox(width: 6),
                 const Padding(
                   padding: EdgeInsets.only(bottom: 2),
-                  child: Text(
-                    'target',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: CupertinoColors.systemGrey2,
-                    ),
-                  ),
+                  child: Text('target', style: AppTextStyles.caption),
                 ),
               ],
             ),
@@ -196,8 +190,8 @@ class _PlanCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 color: plan.isOverAllocated
-                    ? CupertinoColors.systemOrange
-                    : CupertinoColors.systemGrey2,
+                    ? AppColors.statusWarning
+                    : AppColors.textSecondary,
               ),
             ),
           ],
@@ -229,25 +223,15 @@ class _PlansEmptyState extends StatelessWidget {
             const Icon(
               CupertinoIcons.chart_pie,
               size: 56,
-              color: CupertinoColors.systemGrey,
+              color: AppColors.moneyGreen,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Nothing to show',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: CupertinoColors.label,
-              ),
-            ),
+            const Text('Nothing to show', style: AppTextStyles.screenTitle),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel,
-              ),
+              style: AppTextStyles.caption,
             ),
             const SizedBox(height: 24),
             PrimaryGlassButton(
@@ -281,17 +265,10 @@ class _PlansErrorState extends StatelessWidget {
             const Icon(
               CupertinoIcons.exclamationmark_triangle,
               size: 48,
-              color: CupertinoColors.systemOrange,
+              color: AppColors.statusWarning,
             ),
             const SizedBox(height: 16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel,
-              ),
-            ),
+            Text(message, textAlign: TextAlign.center, style: AppTextStyles.caption),
             const SizedBox(height: 20),
             PrimaryGlassButton(
               label: 'Try Again',
