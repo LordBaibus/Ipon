@@ -31,12 +31,6 @@ class BudgetsService {
     }
     return null;
   }
-
-  /// Loads the active budget (and its computed pacing) for a scope.
-  /// [groupId] null means the caller's personal budget.
-  ///
-  /// Throws on failure so the AsyncNotifier can show an error state
-  /// rather than a silently empty budget.
   static Future<Budget> fetchBudget(
       Ref ref,
       String token, {
@@ -56,8 +50,6 @@ class BudgetsService {
 
     return Budget.fromJson(data);
   }
-
-  /// Creates or updates the limit and cycle for a scope.
   static Future<BudgetActionResult> setBudget(
       Ref ref, {
         required String token,
