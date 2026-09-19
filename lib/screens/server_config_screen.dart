@@ -125,43 +125,36 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                   ],
 
                   const SizedBox(height: 24),
-                  // Box-type button: a plain ClipRRect forces square
-                  // (slightly rounded) corners regardless of whatever
-                  // default shape GlassButton.custom would otherwise
-                  // draw, so this does not depend on guessing at
-                  // liquid_glass_widgets' own shape enum/constructors.
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: SizedBox(
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: GlassButton.custom(
+                      onTap: isConnecting ? () {} : _attemptConnect,
+                      enabled: !isConnecting,
                       width: double.infinity,
                       height: 56,
-                      child: GlassButton.custom(
-                        onTap: isConnecting ? () {} : _attemptConnect,
-                        enabled: !isConnecting,
-                        width: double.infinity,
-                        height: 56,
-                        child: isConnecting
-                            ? const CupertinoActivityIndicator(
-                          color: CupertinoColors.black,
-                        )
-                            : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(
-                              CupertinoIcons.arrow_right_circle_fill,
+                      shape: const LiquidRoundedRectangle(borderRadius: 14),
+                      child: isConnecting
+                          ? const CupertinoActivityIndicator(
+                        color: CupertinoColors.black,
+                      )
+                          : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            CupertinoIcons.arrow_right_circle_fill,
+                            color: CupertinoColors.black,
+                            size: 20,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Connect to Server',
+                            style: TextStyle(
                               color: CupertinoColors.black,
-                              size: 20,
+                              fontWeight: FontWeight.w700,
                             ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Connect to Server',
-                              style: TextStyle(
-                                color: CupertinoColors.black,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
