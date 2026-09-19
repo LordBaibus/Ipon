@@ -12,6 +12,7 @@ import '../../core/providers/plans_provider.dart';
 import '../../core/services/ocr_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
+import '../dashboard/dashboard_screen.dart' show kAppBarClearance;
 
 class ExpenseCreateScreen extends ConsumerStatefulWidget {
   final int? initialPlanId;
@@ -263,6 +264,7 @@ class _ExpenseCreateScreenState extends ConsumerState<ExpenseCreateScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           children: [
+            const SizedBox(height: kAppBarClearance),
             PrimaryGlassButton(
               label: _isScanning ? 'Reading receipt…' : 'Scan Receipt',
               icon: CupertinoIcons.camera,
