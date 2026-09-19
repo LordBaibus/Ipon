@@ -7,7 +7,9 @@ import '../../core/models/plan.dart' show formatPeso;
 import '../../core/providers/expenses_provider.dart';
 import '../../core/providers/groups_provider.dart';
 import '../../core/services/expenses_service.dart';
+import '../../core/theme/app_theme.dart';
 import '../../widgets/primary_glass_button.dart';
+import '../dashboard/dashboard_screen.dart' show kAppBarClearance;
 import 'expense_create_screen.dart';
 import 'expense_detail_screen.dart';
 
@@ -64,11 +66,17 @@ class _ExpensesListScreenState extends ConsumerState<ExpensesListScreen> {
         title: const Text('Expenses'),
         actions: [
           GlassButton(
-            icon: const Icon(CupertinoIcons.slider_horizontal_3),
+            icon: const Icon(
+              CupertinoIcons.slider_horizontal_3,
+              color: AppColors.moneyGreen,
+            ),
             onTap: () => _showFilterSheet(context, filters),
           ),
           GlassButton(
-            icon: const Icon(CupertinoIcons.add),
+            icon: const Icon(
+              CupertinoIcons.add,
+              color: AppColors.moneyGreen,
+            ),
             onTap: () async {
               await Navigator.of(context).push(
                 CupertinoPageRoute(builder: (_) => const ExpenseCreateScreen()),
@@ -81,6 +89,7 @@ class _ExpensesListScreenState extends ConsumerState<ExpensesListScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            const SizedBox(height: kAppBarClearance),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: Column(
@@ -98,7 +107,10 @@ class _ExpensesListScreenState extends ConsumerState<ExpensesListScreen> {
                   GlassTextField(
                     controller: _searchController,
                     placeholder: 'Search merchant, notes, or category',
-                    prefixIcon: const Icon(CupertinoIcons.search),
+                    prefixIcon: const Icon(
+                      CupertinoIcons.search,
+                      color: AppColors.moneyGreen,
+                    ),
                     textInputAction: TextInputAction.search,
                     onSubmitted: _applySearch,
                   ),
@@ -114,16 +126,13 @@ class _ExpensesListScreenState extends ConsumerState<ExpensesListScreen> {
                     const Icon(
                       CupertinoIcons.line_horizontal_3_decrease,
                       size: 14,
-                      color: CupertinoColors.systemGrey,
+                      color: AppColors.textSecondary,
                     ),
                     const SizedBox(width: 6),
                     const Expanded(
                       child: Text(
                         'Filters are narrowing this list',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: CupertinoColors.systemGrey,
-                        ),
+                        style: AppTextStyles.caption,
                       ),
                     ),
                     GestureDetector(
@@ -132,7 +141,7 @@ class _ExpensesListScreenState extends ConsumerState<ExpensesListScreen> {
                         'Clear',
                         style: TextStyle(
                           fontSize: 13,
-                          color: CupertinoColors.activeBlue,
+                          color: AppColors.moneyGreen,
                         ),
                       ),
                     ),
@@ -182,7 +191,7 @@ class _ExpensesListScreenState extends ConsumerState<ExpensesListScreen> {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: CupertinoColors.white,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -261,7 +270,7 @@ class _ExpensesListScreenState extends ConsumerState<ExpensesListScreen> {
       trailing: selected
           ? const Icon(
         CupertinoIcons.checkmark_circle_fill,
-        color: CupertinoColors.activeGreen,
+        color: AppColors.moneyGreen,
       )
           : null,
       onTap: onTap,
@@ -330,27 +339,18 @@ class _LedgerTotal extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Total',
-            style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey2),
-          ),
+          const Text('Total', style: AppTextStyles.caption),
           const SizedBox(height: 4),
           Text(
             formatPeso(page.totalAmount),
             style: const TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w700,
-              color: CupertinoColors.activeGreen,
+              color: AppColors.moneyGreen,
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            countLabel,
-            style: const TextStyle(
-              fontSize: 12,
-              color: CupertinoColors.systemGrey2,
-            ),
-          ),
+          Text(countLabel, style: AppTextStyles.caption),
         ],
       ),
     );
@@ -390,7 +390,7 @@ class _ExpenseRow extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: CupertinoColors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -400,7 +400,7 @@ class _ExpenseRow extends StatelessWidget {
                           child: Icon(
                             CupertinoIcons.doc_text_viewfinder,
                             size: 13,
-                            color: CupertinoColors.systemGrey,
+                            color: AppColors.moneyGreen,
                           ),
                         ),
                     ],
@@ -410,10 +410,7 @@ class _ExpenseRow extends StatelessWidget {
                     link ?? expense.category,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: CupertinoColors.systemGrey2,
-                    ),
+                    style: AppTextStyles.caption,
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -423,7 +420,7 @@ class _ExpenseRow extends StatelessWidget {
                         '${expense.isMine ? "you paid" : "${expense.payerName ?? "someone"} paid"}',
                     style: const TextStyle(
                       fontSize: 11,
-                      color: CupertinoColors.systemGrey,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -435,7 +432,7 @@ class _ExpenseRow extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: CupertinoColors.white,
+                color: AppColors.textPrimary,
               ),
             ),
           ],
@@ -461,16 +458,12 @@ class _LedgerEmpty extends StatelessWidget {
             const Icon(
               CupertinoIcons.square_list,
               size: 56,
-              color: CupertinoColors.systemGrey,
+              color: AppColors.moneyGreen,
             ),
             const SizedBox(height: 16),
             Text(
               hasFilters ? 'Nothing matches' : 'No expenses yet',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: CupertinoColors.label,
-              ),
+              style: AppTextStyles.screenTitle,
             ),
             const SizedBox(height: 8),
             Text(
@@ -479,10 +472,7 @@ class _LedgerEmpty extends StatelessWidget {
                   : 'Add your first expense by typing it in, or scan a receipt '
                   'and let Ipon read it for you.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel,
-              ),
+              style: AppTextStyles.caption,
             ),
             const SizedBox(height: 24),
             PrimaryGlassButton(
@@ -516,17 +506,10 @@ class _LedgerError extends StatelessWidget {
             const Icon(
               CupertinoIcons.exclamationmark_triangle,
               size: 48,
-              color: CupertinoColors.systemOrange,
+              color: AppColors.statusWarning,
             ),
             const SizedBox(height: 16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel,
-              ),
-            ),
+            Text(message, textAlign: TextAlign.center, style: AppTextStyles.caption),
             const SizedBox(height: 20),
             PrimaryGlassButton(
               label: 'Try Again',
@@ -549,15 +532,7 @@ class _FilterLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text.toUpperCase(),
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-          color: CupertinoColors.systemGrey,
-        ),
-      ),
+      child: Text(text.toUpperCase(), style: AppTextStyles.sectionLabel),
     );
   }
 }
