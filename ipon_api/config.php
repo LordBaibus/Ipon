@@ -16,9 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
  
 function get_db(): mysqli {
-    $conn = @new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
- 
-    if ($conn->connect_error) {
+    try {
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    } catch (mysqli_sql_exception $e) {
         http_response_code(500);
         echo json_encode([
             'success' => false,
@@ -26,7 +26,7 @@ function get_db(): mysqli {
         ]);
         exit();
     }
- 
+
     $conn->set_charset('utf8mb4');
     return $conn;
 }

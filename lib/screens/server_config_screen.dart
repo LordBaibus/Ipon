@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../core/providers/server_config_provider.dart';
+import '../core/theme/app_theme.dart';
 
 class ServerConfigScreen extends ConsumerStatefulWidget {
   final Widget homeScreen;
@@ -54,10 +55,19 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(
-                    CupertinoIcons.wifi,
-                    size: 56,
-                    color: CupertinoColors.activeBlue,
+                  Container(
+                    width: 88,
+                    height: 88,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.moneyGreenTint,
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.wifi,
+                      size: 44,
+                      color: AppColors.moneyGreen,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -65,8 +75,8 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: CupertinoColors.label,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -74,10 +84,7 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                     'Enter the server address to continue. '
                         'You can find this in your API documentation.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: CupertinoColors.secondaryLabel,
-                    ),
+                    style: AppTextStyles.caption,
                   ),
                   const SizedBox(height: 32),
 
@@ -86,7 +93,10 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                     placeholder: 'e.g. https://ipon-app.com/api',
                     keyboardType: TextInputType.url,
                     enabled: !isConnecting,
-                    prefixIcon: const Icon(CupertinoIcons.link),
+                    prefixIcon: const Icon(
+                      CupertinoIcons.link,
+                      color: AppColors.moneyGreen,
+                    ),
                     onSubmitted: (_) => _attemptConnect(),
                   ),
 
@@ -97,7 +107,7 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                       children: [
                         const Icon(
                           CupertinoIcons.exclamationmark_circle,
-                          color: CupertinoColors.systemRed,
+                          color: AppColors.statusNegative,
                           size: 18,
                         ),
                         const SizedBox(width: 6),
@@ -105,7 +115,7 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                           child: Text(
                             config.errorMessage!,
                             style: const TextStyle(
-                              color: CupertinoColors.systemRed,
+                              color: AppColors.statusNegative,
                               fontSize: 13,
                             ),
                           ),
@@ -115,34 +125,43 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                   ],
 
                   const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: GlassButton.custom(
-                      onTap: isConnecting ? () {} : _attemptConnect,
-                      enabled: !isConnecting,
+                  // Box-type button: a plain ClipRRect forces square
+                  // (slightly rounded) corners regardless of whatever
+                  // default shape GlassButton.custom would otherwise
+                  // draw, so this does not depend on guessing at
+                  // liquid_glass_widgets' own shape enum/constructors.
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: SizedBox(
                       width: double.infinity,
-                      height: 52,
-                      child: isConnecting
-                          ? const CupertinoActivityIndicator(
-                        color: CupertinoColors.white,
-                      )
-                          : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            CupertinoIcons.arrow_right_circle_fill,
-                            color: CupertinoColors.white,
-                            size: 20,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Connect to Server',
-                            style: TextStyle(
-                              color: CupertinoColors.white,
-                              fontWeight: FontWeight.w600,
+                      height: 56,
+                      child: GlassButton.custom(
+                        onTap: isConnecting ? () {} : _attemptConnect,
+                        enabled: !isConnecting,
+                        width: double.infinity,
+                        height: 56,
+                        child: isConnecting
+                            ? const CupertinoActivityIndicator(
+                          color: CupertinoColors.black,
+                        )
+                            : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              CupertinoIcons.arrow_right_circle_fill,
+                              color: CupertinoColors.black,
+                              size: 20,
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 8),
+                            Text(
+                              'Connect to Server',
+                              style: TextStyle(
+                                color: CupertinoColors.black,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -156,7 +175,7 @@ class _ServerConfigScreenState extends ConsumerState<ServerConfigScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 11,
-                      color: CupertinoColors.tertiaryLabel,
+                      color: AppColors.textTertiary,
                       height: 1.5,
                     ),
                   ),

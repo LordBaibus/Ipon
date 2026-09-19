@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/theme/app_theme.dart';
+import '../../widgets/ipon_logo.dart';
 import '../../widgets/primary_glass_button.dart';
 import 'register_screen.dart';
 import 'verify_email_screen.dart';
@@ -73,29 +75,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(
-                    CupertinoIcons.money_dollar_circle_fill,
-                    size: 60,
-                    color: CupertinoColors.activeGreen,
-                  ),
-                  const SizedBox(height: 12),
+                  const Center(child: IponLogo(size: 88)),
+                  const SizedBox(height: 16),
                   const Text(
                     'Ipon',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: CupertinoColors.label,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
                   const Text(
                     'Plan, track, and reach your savings goals.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: CupertinoColors.secondaryLabel,
-                    ),
+                    style: AppTextStyles.caption,
                   ),
                   const SizedBox(height: 32),
 
@@ -105,7 +100,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     enabled: !auth.isBusy,
-                    prefixIcon: const Icon(CupertinoIcons.mail),
+                    prefixIcon: const Icon(
+                      CupertinoIcons.mail,
+                      color: AppColors.moneyGreen,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   GlassPasswordField(
@@ -147,10 +145,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     children: [
                       const Text(
                         "Don't have an account?",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: CupertinoColors.secondaryLabel,
-                        ),
+                        style: AppTextStyles.caption,
                       ),
                       const SizedBox(width: 6),
                       GestureDetector(
@@ -165,7 +160,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           'Create one',
                           style: TextStyle(
                             fontSize: 14,
-                            color: CupertinoColors.activeBlue,
+                            color: AppColors.moneyGreen,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -194,7 +189,7 @@ class _ErrorLine extends StatelessWidget {
       children: [
         const Icon(
           CupertinoIcons.exclamationmark_circle,
-          color: CupertinoColors.systemRed,
+          color: AppColors.statusNegative,
           size: 18,
         ),
         const SizedBox(width: 6),
@@ -202,7 +197,7 @@ class _ErrorLine extends StatelessWidget {
           child: Text(
             message,
             style: const TextStyle(
-              color: CupertinoColors.systemRed,
+              color: AppColors.statusNegative,
               fontSize: 13,
             ),
           ),
