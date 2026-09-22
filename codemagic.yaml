@@ -32,12 +32,10 @@ workflows:
           if grep -q "^platform :ios" ios/Podfile; then
             sed -i '' "s/^platform :ios.*/platform :ios, '15.5'/" ios/Podfile
           else
-            sed -i '' "1i\\
-  platform :ios, '15.5'
-  " ios/Podfile
+            printf "%s\n%s\n" "platform :ios, '15.5'" "$(cat ios/Podfile)" > ios/Podfile
           fi
-          cat ios/Podfile | head -5
- 
+          head -5 ios/Podfile
+
       - name: Set Xcode project deployment target to 15.5
         script: |
           set -e
@@ -45,65 +43,65 @@ workflows:
           # floor. The Runner target's own IPHONEOS_DEPLOYMENT_TARGET
           # (Debug/Release/Profile configs) can independently still be
           # lower and cause the same "requires higher deployment target"
-  # error again at the actual build step. Bump all of them too.
-  sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = .*;/IPHONEOS_DEPLOYMENT_TARGET = 15.5;/g" \
-  ios/Runner.xcodeproj/project.pbxproj
-  grep IPHONEOS_DEPLOYMENT_TARGET ios/Runner.xcodeproj/project.pbxproj
+          # error again at the actual build step. Bump all of them too.
+          sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = .*;/IPHONEOS_DEPLOYMENT_TARGET = 15.5;/g" \
+            ios/Runner.xcodeproj/project.pbxproj
+          grep IPHONEOS_DEPLOYMENT_TARGET ios/Runner.xcodeproj/project.pbxproj
 
-- name: Install CocoaPods dependencies
-  script: |
-    cd ios && pod install --repo-update
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios && pod install --repo-update
 
-- name: Build unsigned iOS app
-  script: |
-    flutter build ios --release --no-codesign
+      - name: Build unsigned iOS app
+        script: |
+          flutter build ios --release --no-codesign
 
-- name: Package into unsigned .ipa
-  script: |
-    set -e
-    cd build/ios/iphoneos
-    rm -rf Payload
-    mkdir Payload
-    cp -r Runner.app Payload/
-    # -X strips extended attributes/resource forks that can confuse
-    # re-signing tools; -r recurses; -y preserves symlinks as-is
-    # instead of dereferencing them (app bundles rely on this).
-    zip -qXry unsigned_app.ipa Payload
-    rm -rf Payload
+      - name: Package into unsigned .ipa
+        script: |
+          set -e
+          cd build/ios/iphoneos
+          rm -rf Payload
+          mkdir Payload
+          cp -r Runner.app Payload/
+          # -X strips extended attributes/resource forks that can confuse
+          # re-signing tools; -r recurses; -y preserves symlinks as-is
+          # instead of dereferencing them (app bundles rely on this).
+          zip -qXry unsigned_app.ipa Payload
+          rm -rf Payload
 
-artifacts:
-  - build/ios/iphoneos/unsigned_app.ipa
+    artifacts:
+      - build/ios/iphoneos/unsigned_app.ipa
 
-publishing:
-  email:
-    recipients:
-      - thesiscpe837@gmail.com
-    notify:
-      success: true
-      failure: true
+    publishing:
+      email:
+        recipients:
+          - thesiscpe837@gmail.com
+        notify:
+          success: true
+          failure: true
 
-android-apk:
-  name: Android APK (sideload)
-  max_build_duration: 30
-  instance_type: linux_x2
-  environment:
-    flutter: stable
-  scripts:
-    - name: Get Flutter packages
-      script: |
-        flutter packages pub get
+  android-apk:
+    name: Android APK (sideload)
+    max_build_duration: 30
+    instance_type: linux_x2
+    environment:
+      flutter: stable
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
 
-    - name: Build APK
-      script: |
-        flutter build apk --release
+      - name: Build APK
+        script: |
+          flutter build apk --release
 
-  artifacts:
-    - build/app/outputs/flutter-apk/*.apk
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
 
-  publishing:
-    email:
-      recipients:
-        - thesiscpe837@gmail.com
-      notify:
-        success: true
-        failure: true
+    publishing:
+      email:
+        recipients:
+          - thesiscpe837@gmail.com
+        notify:
+          success: true
+          failure: true
