@@ -1,82 +1,22 @@
 workflows:
-  ios-sideload-free-signing:
-    name: iOS Sideload (Free Apple ID)
-    max_build_duration: 60
-    instance_type: mac_mini_m2
+  ios-free-build:
+    name: iOS Free Accounts Build
+    max_build_duration: 120
+    instance_type: mac_mini_m1
     environment:
-      groups:
-        - ios_signing   # CM_CERTIFICATE, CM_CERTIFICATE_PASSWORD, CM_PROVISIONING_PROFILE
-      vars:
-        BUNDLE_ID: "com.ipon.app"   # <-- change to match what you set in Xcode
-        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
-        XCODE_SCHEME: "Runner"
       flutter: stable
       xcode: latest
-      cocoapods: default
     scripts:
-      - name: Get Flutter packages
+      - name: Get flutter dependencies
+        script: flutter packages pub get
+      - name: Build unsigned iOS IPA
         script: |
-          flutter packages pub get
+          # The --no-codesign flag is critical for free accounts
+          flutter build ios --release --no-codesign
 
-      - name: Install CocoaPods dependencies
-        script: |
-          find . -name "Podfile" -maxdepth 2 -execdir pod install \;
-
-      - name: Set up manual code signing
-        script: |
-          keychain initialize
-          echo $CM_CERTIFICATE | base64 --decode > /tmp/certificate.p12
-          keychain add-certificates \
-            --certificate /tmp/certificate.p12 \
-            --certificate-password $CM_CERTIFICATE_PASSWORD
-          echo $CM_PROVISIONING_PROFILE | base64 --decode > /tmp/profile.mobileprovision
-          PROFILES_HOME="$HOME/Library/MobileDevice/Provisioning Profiles"
-          mkdir -p "$PROFILES_HOME"
-          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< "$(security cms -D -i /tmp/profile.mobileprovision)")
-          cp /tmp/profile.mobileprovision "$PROFILES_HOME/$PROFILE_UUID.mobileprovision"
-          xcode-project use-profiles
-
-      - name: Flutter build ipa (manual signing)
-        script: |
-          flutter build ipa --release \
-            --export-options-plist=/Users/builder/export_options.plist \
-            || flutter build ipa --release --no-codesign
-
+          # Manually package the .app into a .ipa structure
+          mkdir -p build/ios/iphoneos/Payload
+          cp -r build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload/
+          cd build/ios/iphoneos && zip -r unsigned_app.ipa Payload
     artifacts:
-      - build/ios/ipa/*.ipa
-      - "/tmp/xcodebuild_logs/*.log"
-      - flutter_drive.log
-
-    publishing:
-      email:
-        recipients:
-          - thesiscpe837@gmail.com
-        notify:
-          success: true
-          failure: true
-
-  android-apk:
-    name: Android APK (sideload)
-    max_build_duration: 30
-    instance_type: linux_x2
-    environment:
-      flutter: stable
-    scripts:
-      - name: Get Flutter packages
-        script: |
-          flutter packages pub get
-
-      - name: Build APK
-        script: |
-          flutter build apk --release
-
-    artifacts:
-      - build/app/outputs/flutter-apk/*.apk
-
-    publishing:
-      email:
-        recipients:
-          - thesiscpe837@gmail.com
-        notify:
-          success: true
-          failure: true
+      - build/ios/iphoneos/unsigned_app.ipa
