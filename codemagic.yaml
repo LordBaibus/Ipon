@@ -1,22 +1,71 @@
 workflows:
-  ios-free-build:
-    name: iOS Free Accounts Build
-    max_build_duration: 120
-    instance_type: mac_mini_m1
+  ios-unsigned-ipa:
+    name: iOS Unsigned IPA (for Sideloadly)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
     environment:
       flutter: stable
       xcode: latest
+      cocoapods: default
     scripts:
-      - name: Get flutter dependencies
-        script: flutter packages pub get
-      - name: Build unsigned iOS IPA
+      - name: Get Flutter packages
         script: |
-          # The --no-codesign flag is critical for free accounts
+          flutter packages pub get
+
+      - name: Install CocoaPods dependencies
+        script: |
+          find . -name "Podfile" -maxdepth 2 -execdir pod install \;
+
+      - name: Build unsigned iOS app
+        script: |
           flutter build ios --release --no-codesign
 
-          # Manually package the .app into a .ipa structure
-          mkdir -p build/ios/iphoneos/Payload
-          cp -r build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload/
-          cd build/ios/iphoneos && zip -r unsigned_app.ipa Payload
+      - name: Package into unsigned .ipa
+        script: |
+          set -e
+          cd build/ios/iphoneos
+          rm -rf Payload
+          mkdir Payload
+          cp -r Runner.app Payload/
+          # -X strips extended attributes/resource forks that can confuse
+          # re-signing tools; -r recurses; -y preserves symlinks as-is
+          # instead of dereferencing them (app bundles rely on this).
+          zip -qXry unsigned_app.ipa Payload
+          rm -rf Payload
+
     artifacts:
       - build/ios/iphoneos/unsigned_app.ipa
+
+    publishing:
+      email:
+        recipients:
+          - thesiscpe837@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  android-apk:
+    name: Android APK (sideload)
+    max_build_duration: 30
+    instance_type: linux_x2
+    environment:
+      flutter: stable
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+
+      - name: Build APK
+        script: |
+          flutter build apk --release
+
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+
+    publishing:
+      email:
+        recipients:
+          - thesiscpe837@gmail.com
+        notify:
+          success: true
+          failure: true
